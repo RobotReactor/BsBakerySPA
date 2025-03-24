@@ -1,11 +1,10 @@
 ﻿* {
     box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 
 #root {
-    max-width: 1280px;
     margin: 0 auto;
-    padding: 2rem;
     text-align: center;
 }
 
@@ -19,7 +18,7 @@ body {
     background-size: cover;
     background-attachment: fixed;
     font-family: "Nothing You Could Do", cursive;
-    color: #966F33;
+    color: black;
 }
 
 .nothing-you-could-do-regular {
@@ -64,8 +63,8 @@ body {
 }
 
 .logo {
-    height: 120px;
-    width: 120px;
+    height: 220px;
+    width: 220px;
     border-radius: 50%;
     border: 2px solid #966F33;
     margin-right: 2rem;
@@ -114,18 +113,47 @@ body {
 .icon {
     font-size: 1.5rem;
     cursor: pointer;
-    
+    color: #966F33;
 }
 
     .icon:hover {
         color: #c7a673;
     }
 
-.content {
-    margin-top: 140px; /* Adjusted to account for the fixed navbar */
+.homeSpacer {
+    height: 200px; /* Adjust this value based on your navbar height */
+}
+
+.heroTitle {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    height: 120px;
+    width: 120px;
+    position: relative;
+}
+.heroText {
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+    .heroText p {
+        margin: 0;
+        font-size: 1.4rem;
+    }
+.bakedGoods {
     padding: 2rem;
-    padding-top: 100px; /* Adjust this value based on the height of your navbar */
-    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    width: 80vw;
+    height: 100%;
+    margin-top: -200px;
+}
+
+.content {
+    padding: 2rem;
+    padding-top: 100px;
+    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     height: 2200px;
