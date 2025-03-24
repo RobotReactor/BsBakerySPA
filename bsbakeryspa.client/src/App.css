@@ -1,4 +1,8 @@
-﻿#root {
+﻿* {
+    box-sizing: border-box;
+}
+
+#root {
     max-width: 1280px;
     margin: 0 auto;
     padding: 2rem;
@@ -35,14 +39,23 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 95vw;
+    width: 100%;
     position: fixed;
     top: 0;
     left: 0;
-    background-color: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.0);
     padding: 1rem 2rem;
+    padding-right: 8rem;
     z-index: 1000; /* Ensure the navbar is above other content */
+    transition: top 0.4s ease-in-out, background 0.4s ease-in-out, padding-right 0.4s ease-in-out;
+}
+
+.navbar-scrolled {
+    top: 0;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background when scrolled */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding-right: 2rem;
 }
 
 .navbar-left {
@@ -51,11 +64,17 @@ body {
 }
 
 .logo {
-    height: 80px;
-    width: 80px;
+    height: 120px;
+    width: 120px;
     border-radius: 50%;
-    margin-right: 2rem;
     border: 2px solid #966F33;
+    margin-right: 2rem;
+    transition: height 0.4s ease-in-out, width 0.4s ease-in-out;
+}
+
+.logo-scrolled {
+    height: 50px;
+    width: 50px;
 }
 
 .nav-menu {
@@ -74,8 +93,14 @@ body {
         text-decoration: none;
         color: #333;
         font-weight: bold;
+        font-size: 2.1rem;
+        transition: font-size 0.4s ease-in-out;
+    }
+
+    .nav-menu-scrolled a {
         font-size: 1.4rem;
     }
+
         .nav-menu a:hover {
             color: #c7a673;
         }
@@ -89,15 +114,20 @@ body {
 .icon {
     font-size: 1.5rem;
     cursor: pointer;
+    
 }
+
     .icon:hover {
-        color: #c7a673
+        color: #c7a673;
     }
 
-.userIcon {
-    font-size: 1.8rem;
-    color: #966F33;
-}
-
-.cart-icon {
+.content {
+    margin-top: 140px; /* Adjusted to account for the fixed navbar */
+    padding: 2rem;
+    padding-top: 100px; /* Adjust this value based on the height of your navbar */
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: 2200px;
+    width: 80vw;
 }
