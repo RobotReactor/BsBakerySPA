@@ -1,0 +1,40 @@
+.options {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.option {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px;
+    width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+    .option h2 {
+        margin: 0 0 8px;
+    }
+
+    .option p {
+        margin: 0 0 16px;
+    }
+
+    .option .special {
+        color: #ff6347;
+        font-weight: bold;
+    }
+
+    .option button {
+        background-color: #ff6347;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .option button:hover {
+            background-color: #ff4500;
+        }

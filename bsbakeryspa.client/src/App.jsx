@@ -1,30 +1,27 @@
 import { useEffect, useState, React } from 'react';
 import './App.css';
+import { FaUser, FaShoppingCart } from 'react-icons/fa';
+import logo from '../src/assets/logo.jpg';
+
 
 const App = () => {
-    const options = [
-        { id: 1, name: 'Bagels', special: 'Cedar, Asiago, Sesame, Everything, Cheddar Jalapeno', price: '$20' },
-        { id: 2, name: 'Loafs', special: 'Pepperoni Mozzarella, Cheddar Jalapeno, Cinnamon Apple, Everything', price: '$5' },
-        { id: 3, name: 'Cookies', special: 'Chocolate Chips', price: '$15' },
-    ];
-
-    const handleOrder = (item) => {
-        alert(`You have ordered: ${item.name}`);
-    };
-
     return (
-        <div className="orderingMenu">
-            <h1>Order Here</h1>
-            <div className="options">
-                {options.map((item) => (
-                    <div key={item.id} className="option">
-                        <h2>{item.name}</h2>
-                        {item.special && <p className="special">{item.special}</p>}
-                        <p>{item.price}</p>
-                        <button onClick={() => handleOrder(item)}>Order</button>
-                    </div>
-                ))}
-            </div>
+        <div>
+            <nav className="navbar">
+                <div className="navbar-left">
+                    <img src={logo} alt="B's Bakery Logo" className="logo" />
+                    <ul className="nav-menu">
+                        <li><a href="#menu">Menu</a></li>
+                        <li><a href="#order">Order</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#about">About Me</a></li>
+                    </ul>
+                </div>
+                <div className="navbar-right">
+                    <FaUser className="icon" id="userIcon" />
+                    <FaShoppingCart className="icon" id="cartIcon" />
+                </div>
+            </nav>
         </div>
     );
 };
