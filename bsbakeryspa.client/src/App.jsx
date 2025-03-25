@@ -56,12 +56,15 @@ const App = () => {
                 <div className="heroText" id="homeBottomText"><p>Explore my menu and order to experience the taste of Sourdough goodness!</p><FaArrowDown id="arrowDownIcon" /></div>
             </section>
             <section className="menu" id="menu">
+                <div className="menu-header">
+                    <h2>In the Oven:</h2>
+                </div>
                 <div className="menu-item">
                     <img src={bagels} alt="Bagels" className="menu-image" />
                     <div className="menu-text">
                         <h2>BAGELS</h2>
-                        <p>$22 / dozen | $12 / half-dozen (plain)</p>
-                        <p>+ $2 per topping (4 ea. topping - max 3 types)</p>
+                        <p>Plain: $12 / half-dozen | $22 / dozen</p>
+                        <p>Toppings (+$2 each, 4 per topping, max 3 types):</p>
                         <ul>
                             <li>Cheddar</li>
                             <li>Asiago</li>
@@ -75,7 +78,8 @@ const App = () => {
                     <img src={loafs} alt="Loafs" className="menu-image" />
                     <div className="menu-text">
                         <h2>LOAFS</h2>
-                        <p>$12 Regular (2 for $20) | $16 Inclusions</p>
+                        <p>Regular: $12 each (2 for $20)</p>
+                        <p>Inclusions: $16 each</p>
                         <ul>
                             <li>Pepperoni Mozzarella</li>
                             <li>Cheddar Jalape&ntilde;o</li>

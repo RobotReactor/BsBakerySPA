@@ -27,8 +27,6 @@ body {
     text-align: center;
 }
 
-/* App.css */
-
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -41,13 +39,13 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.0);
     padding: 1rem 2rem;
     padding-right: 8rem;
-    z-index: 1000; /* Ensure the navbar is above other content */
+    z-index: 1000;
     transition: top 0.4s ease-in-out, background 0.4s ease-in-out, padding-right 0.4s ease-in-out;
 }
 
 .navbar-scrolled {
     top: 0;
-    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background when scrolled */
+    background-color: rgba(255, 255, 255, 0.8); 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding-right: 2rem;
 }
@@ -116,8 +114,9 @@ body {
     }
 
 /* Home Section */
+
 .home {
-    height: 100vh; /* Full viewport height */
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -135,7 +134,7 @@ body {
 }
 
 .homeSpacer {
-    height: 0px; /* Adjust this value based on your navbar height */
+    height: 0px; 
 }
 
 .heroTitle {
@@ -194,10 +193,20 @@ body {
     margin: 2rem auto;
 }
 
+.menu-header h2 {
+    font-size: 2.5rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+}
+
 .menu-item {
     display: flex;
     align-items: center;
-    justify-content: center; /* Center the content */
+    justify-content: center;
     margin-bottom: 2rem;
 }
 
@@ -206,7 +215,7 @@ body {
     }
 
 .menu-image {
-    width: 240px; /* Increase the size of the images */
+    width: 240px;
     height: auto;
     margin: 0 2rem;
     border-radius: 8px;
@@ -215,9 +224,9 @@ body {
 
 .menu-text {
     flex: 1;
-    text-align: left;
-    margin: 0 auto; /* Center the text container */
-    max-width: 600px; /* Optional: Set a max width for the text container */
+    text-align: center;
+    margin: 0 auto;
+    max-width: 600px;
 }
 
     .menu-text h2 {
@@ -228,7 +237,7 @@ body {
 
     .menu-text p {
         margin: 0 0 1rem;
-        font-size: 1.2rem;
+        font-size: 1.5rem;
         color: #666;
     }
 
@@ -236,10 +245,19 @@ body {
         list-style: none;
         padding: 0;
         margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Align items to the start */
     }
+
+        .menu-text ul li::before {
+            content: "- ";
+            color: #666;
+            margin-right: 0.5rem;
+        }
 
         .menu-text ul li {
             margin-bottom: 0.5rem;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #666;
         }
