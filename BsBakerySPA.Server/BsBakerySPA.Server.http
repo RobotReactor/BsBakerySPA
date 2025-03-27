@@ -1,6 +1,0 @@
-@BsBakerySPA.Server_HostAddress = http://localhost:5030
-
-GET {{BsBakerySPA.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
