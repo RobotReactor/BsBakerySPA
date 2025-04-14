@@ -36,3 +36,4 @@ C:\Users\maxwe\Documents\Github Directories\BsBakerySPA\BsBakerySPA.Server\obj\D
 C:\Users\maxwe\Documents\Github Directories\BsBakerySPA\BsBakerySPA.Server\obj\Debug\net8.0\BsBakerySPA.Server.pdb
 C:\Users\maxwe\Documents\Github Directories\BsBakerySPA\BsBakerySPA.Server\obj\Debug\net8.0\BsBakerySPA.Server.genruntimeconfig.cache
 C:\Users\maxwe\Documents\Github Directories\BsBakerySPA\BsBakerySPA.Server\obj\Debug\net8.0\ref\BsBakerySPA.Server.dll
+C:\Users\maxwe\Documents\Github Directories\BsBakerySPA\BsBakerySPA.Server\obj\Debug\net8.0\BsBakerySPA.Server.sourcelink.json

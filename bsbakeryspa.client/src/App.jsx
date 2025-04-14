@@ -1,15 +1,21 @@
 import { useEffect, useState, React } from 'react';
 import './App.css';
-import { FaUser, FaShoppingCart, FaArrowDown } from 'react-icons/fa';
+import { FaUser, FaShoppingCart, FaArrowDown, FaTrashAlt, FaTimes } from 'react-icons/fa';
 import logo from '../src/assets/logo.jpg';
 import bagels from '../src/assets/Bagels.jpg';
 import loafs from '../src/assets/Loafs.jpg';
 import cookies from '../src/assets/Cookies.jpg';
 import baked_goods from '../src/assets/baked_goods.jpg';
 
-
 const App = () => {
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [orderItems, setOrderItems] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [customizingItem, setCustomizingItem] = useState(null);
+    const [customOptions, setCustomOptions] = useState([]); 
+
 
     useEffect(() => {
         const handleScroll = () => {
@@ -20,11 +26,140 @@ const App = () => {
             }
         };
 
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' && isModalOpen) {
+                toggleModal();
+            }
+        };
+
         window.addEventListener('scroll', handleScroll);
+        window.addEventListener('keydown', handleKeyDown);
+
         return () => {
             window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('keydown', handleKeyDown);
         };
-    }, []);
+    }, [isModalOpen]);
+
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+
+        if (!isModalOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+
+        if (isModalOpen) {
+            setIsExpanded(false);
+        }
+    };
+
+    const addItemToOrder = (item, price) => {
+        setCustomizingItem({
+            name: item.includes('Half-Dozen') ? 'Bagels (Half-Dozen)' : 'Bagels (Dozen)',
+            price,
+            options: ['Plain', 'Cheddar', 'Asiago', 'Sesame', 'Everything', 'Cheddar Jalapeño'],
+            isEditing: false, // Set the flag to false when adding a new item
+        });
+    };
+
+    const addCookiesToOrder = (cookieType, price) => {
+        const cookieItem = {
+            name: `Cookies (${cookieType})`,
+            price: price,
+        };
+    
+        setOrderItems((prevOrderItems) => [...prevOrderItems, cookieItem]);
+    };
+    
+    const addLoafToOrder = (loafType, price) => {
+        const loafItem = {
+            name: `Loaf (${loafType})`,
+            price: price,
+        };
+    
+        setOrderItems((prevOrderItems) => [...prevOrderItems, loafItem]);
+    };
+
+    const removeItemFromOrder = (index) => {
+        setOrderItems((prevOrderItems) => prevOrderItems.filter((_, i) => i !== index));
+    };
+
+    const handleOptionChange = (e, option) => {
+        const maxToppings = customizingItem.name.includes('Half-Dozen') ? 2 : 4;
+    
+        if (e.target.checked) {
+            if (customOptions.length < maxToppings) {
+                setCustomOptions([...customOptions, option]);
+            } else {
+                alert(`You can only select up to ${maxToppings} toppings for ${customizingItem.name}.`);
+                e.target.checked = false;
+            }
+        } else {
+            setCustomOptions(customOptions.filter((opt) => opt !== option)); 
+        }
+    };
+
+    const handleCustomizeItem = (index) => {
+        const itemToCustomize = orderItems[index];
+    
+        if (itemToCustomize.name.includes('Bagels')) {
+            setCustomizingItem({
+                index,
+                name: itemToCustomize.name.includes('1/2 Dozen') ? 'Bagels (Half-Dozen)' : 'Bagels (Dozen)',
+                price: itemToCustomize.name.includes('1/2 Dozen') ? 12 : 22,
+                options: ['Plain', 'Cheddar', 'Asiago', 'Sesame', 'Everything', 'Cheddar Jalapeño'],
+                isEditing: true, 
+            });
+    
+            setCustomOptions(Object.keys(itemToCustomize.options));
+        }
+    };
+    
+    const confirmCustomization = () => {
+        if (customOptions.length === 0) {
+            alert('Please select at least one topping.');
+            return;
+        }
+    
+        const basePrice = customizingItem.price; // Base price of the item
+        const additionalToppingCost = customOptions.filter((opt) => opt !== 'Plain').length * 2; // $2 per non-plain topping
+        const totalPrice = basePrice + additionalToppingCost;
+    
+        const bagelDistribution = customOptions.length === 1
+            ? { [customOptions[0]]: customizingItem.name.includes('Half-Dozen') ? 6 : 12 }
+            : {
+                  [customOptions[0]]: customizingItem.name.includes('Half-Dozen') ? 3 : 6,
+                  [customOptions[1]]: customizingItem.name.includes('Half-Dozen') ? 3 : 6,
+              };
+    
+        const customizedItem = {
+            name: customizingItem.name.includes('Half-Dozen') ? '1/2 Dozen Bagels' : 'Dozen Bagels',
+            price: totalPrice,
+            options: bagelDistribution,
+        };
+    
+        setOrderItems((prevOrderItems) => {
+            const updatedOrderItems = [...prevOrderItems];
+    
+            if (customizingItem.isEditing) {
+                updatedOrderItems[customizingItem.index] = customizedItem; // Update the item
+            } else {
+                updatedOrderItems.push(customizedItem); // Add a new item
+            }
+    
+            return updatedOrderItems;
+        });
+    
+        // Reset states
+        setCustomizingItem(null);
+        setCustomOptions([]);
+    };
+
+    const calculateTotal = () => {
+        return orderItems.reduce((sum, item) => sum + item.price, 0);
+    };
 
     return (
         <div>
@@ -58,13 +193,14 @@ const App = () => {
             <section className="menu" id="menu">
                 <div className="menu-header">
                     <h2>In the Oven:</h2>
+                    <button className="order-button" onClick={toggleModal}>Order</button>
                 </div>
                 <div className="menu-item">
                     <img src={bagels} alt="Bagels" className="menu-image" />
                     <div className="menu-text">
                         <h2>BAGELS</h2>
                         <p>Plain: $12 / half-dozen | $22 / dozen</p>
-                        <p>Toppings (+$2 each, 4 per topping, max 3 types):</p>
+                        <p>Toppings (+$2 each, 3 per topping):</p>
                         <ul>
                             <li>Cheddar</li>
                             <li>Asiago</li>
@@ -78,8 +214,8 @@ const App = () => {
                     <img src={loafs} alt="Loafs" className="menu-image" />
                     <div className="menu-text">
                         <h2>LOAFS</h2>
-                        <p>Regular: $12 each (2 for $20)</p>
-                        <p>Inclusions: $16 each</p>
+                        <p>Regular: $12 (2 for $20)</p>
+                        <p>Inclusions: $14 </p>
                         <ul>
                             <li>Pepperoni Mozzarella</li>
                             <li>Cheddar Jalape&ntilde;o</li>
@@ -99,6 +235,128 @@ const App = () => {
                     </div>
                 </div>
             </section>
+            {isModalOpen && (
+                <div
+                    className="modal"
+                    onClick={(e) => {
+                        if (e.target.classList.contains('modal')) {
+                            toggleModal();
+                        }
+                    }}
+                >
+                    <div className="modal-content">
+                        <FaTimes
+                            className="modal-close-icon"
+                            onClick={toggleModal}
+                        />
+
+                        <div className="modal-left">
+                            <h2>Fill Your Basket</h2>
+                            <div className="modal-item">
+                                <h3>Loafs</h3>
+                                <p>Click on a loaf type to add it to your order:</p>
+                                <ul className="loaf-options">
+                                    <li onClick={() => addLoafToOrder('Regular', 12)}>Regular ($12)</li>
+                                    <li onClick={() => addLoafToOrder('Pepperoni Mozzarella', 14)}>Pepperoni Mozzarella ($14)</li>
+                                    <li onClick={() => addLoafToOrder('Cheddar Jalapeño', 14)}>Cheddar Jalapeño ($14)</li>
+                                    <li onClick={() => addLoafToOrder('Cinnamon Apple', 14)}>Cinnamon Apple ($14)</li>
+                                    <li onClick={() => addLoafToOrder('Everything', 14)}>Everything ($14)</li>
+                                </ul>
+                            </div>
+                            <div className="modal-item">
+                                <h3>Bagels</h3>
+                                <button
+                                    onClick={() =>
+                                        setCustomizingItem({
+                                            name: 'Bagels (Half-Dozen)',
+                                            price: 12,
+                                            options: ['Plain', 'Cheddar', 'Asiago', 'Sesame', 'Everything', 'Cheddar Jalapeño'],
+                                        })
+                                    }
+                                >
+                                    Add Half-Dozen ($12)
+                                </button>
+                                <button
+                                    onClick={() =>
+                                        setCustomizingItem({
+                                            name: 'Bagels (Dozen)',
+                                            price: 22,
+                                            options: ['Plain', 'Cheddar', 'Asiago', 'Sesame', 'Everything', 'Cheddar Jalapeño'],
+                                        })
+                                    }
+                                >
+                                    Add Dozen ($22)
+                                </button>
+                            </div>
+                            <div className="modal-item">
+                                <h3>Cookies</h3>
+                                <p>Click on a cookie type to add it to your order:</p>
+                                <ul className="cookie-options">
+                                    <li onClick={() => addCookiesToOrder('Chocolate Chip', 20)}>Chocolate Chip ($20 / dozen)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="modal-right">
+                            <h2>Your Order</h2>
+                            <ul className="order-list">
+                                {orderItems.map((order, index) => (
+                                    <li key={index} className="order-item">
+                                        <span>{order.name} - ${order.price}</span>
+                                        <FaTrashAlt
+                                            className="remove-icon"
+                                            onClick={() => removeItemFromOrder(index)}
+                                        />
+                                        {order.name.includes('Bagels') && (
+                                            <FaUser
+                                                className="customize-icon"
+                                                onClick={() => handleCustomizeItem(index)}
+                                            />
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                            <div className="modal-footer">
+                                <h3>Total: ${calculateTotal()}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {customizingItem && (
+                <div className="customization-modal">
+                    <div className="customization-content">
+                        <h2>Customize Your {customizingItem.name}</h2>
+                        <p>
+                            Select up to {customizingItem.name.includes('Half-Dozen') ? 2 : 4} toppings. 
+                            (+$2 for each topping that isn't Plain)
+                        </p>
+                        <ul className="customization-options">
+                            {customizingItem.options.map((option, index) => (
+                                <li key={index}>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            value={option}
+                                            onChange={(e) => handleOptionChange(e, option)}
+                                            checked={customOptions.includes(option)}
+                                        />
+                                        {option}
+                                    </label>
+                                </li>
+                            ))}
+                        </ul>
+                        <button onClick={confirmCustomization}>Add to Order</button>
+                        <button
+                            onClick={() => {
+                                setCustomizingItem(null); 
+                                setCustomOptions([]); 
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
