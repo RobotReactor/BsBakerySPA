@@ -730,9 +730,61 @@ body {
 }
 
 .order-summary li {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+.order-summary li[style*="color: red"] {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.bagel-options {
+    list-style: none;
     margin: 10px 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.bagel-options li {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 0.9rem;
     color: #555;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.bagel-options button {
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    border: none;
+    padding: 5px 10px; /* Adjust padding for better size */
+    border-radius: 5px;
+    font-size: 0.85rem; /* Slightly larger font size */
+    cursor: pointer;
+    margin: 0 5px; /* Add gap between buttons */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.bagel-options button:hover:not(:disabled) {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.bagel-options button:disabled {
+    background-color: #ccc; 
+    cursor: not-allowed;
+    color: #666;
 }
 
 .checkout-actions {
@@ -742,8 +794,8 @@ body {
 }
 
 .checkout-actions button {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -753,40 +805,13 @@ body {
 }
 
 .checkout-actions button:hover {
-    background-color: #45a049;
+    background-color: #ffd9c3;
 }
 
 .checkout-actions button:nth-child(2) {
     background-color: #ff9800;
-}
+    color: rgb(255, 255, 255);
 
-.checkout-actions button:nth-child(2):hover {
-    background-color: #e68900;
-}
-
-.checkout-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.checkout-actions button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.checkout-actions button:hover {
-    background-color: #45a049;
-}
-
-.checkout-actions button:nth-child(2) {
-    background-color: #ff9800;
 }
 
 .checkout-actions button:nth-child(2):hover {
@@ -854,8 +879,8 @@ body {
 }
 
 .payment-actions button {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -865,11 +890,12 @@ body {
 }
 
 .payment-actions button:hover {
-    background-color: #45a049;
+    background-color: #ffd9c3;
 }
 
 .payment-actions button:nth-child(2) {
     background-color: #ff9800;
+    color: rgb(255, 255, 255);
 }
 
 .payment-actions button:nth-child(2):hover {
@@ -912,8 +938,8 @@ body {
 }
 
 .payment-modal-content button {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -924,13 +950,14 @@ body {
 }
 
 .payment-modal-content button:hover {
-    background-color: #45a049;
+    background-color: #ffd9c3;
 }
 
-.payment-modal-content button:nth-child(2) {
+#save-receipt-button {
     background-color: #ff9800;
+    color: rgb(255, 255, 255);
 }
 
-.payment-modal-content button:nth-child(2):hover {
+#save-receipt-button:hover {
     background-color: #e68900;
 }

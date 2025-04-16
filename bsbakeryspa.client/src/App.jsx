@@ -154,12 +154,12 @@ const App = () => {
         const additionalToppingCost = customOptions.filter((opt) => opt !== 'Plain').length * 2; // $2 per non-plain topping
         const totalPrice = basePrice + additionalToppingCost;
     
-        const bagelDistribution = customOptions.length === 1
-            ? { [customOptions[0]]: customizingItem.name.includes('Half-Dozen') ? 6 : 12 }
-            : {
-                  [customOptions[0]]: customizingItem.name.includes('Half-Dozen') ? 3 : 6,
-                  [customOptions[1]]: customizingItem.name.includes('Half-Dozen') ? 3 : 6,
-              };
+        const bagelDistribution = customOptions.reduce((distribution, option, index) => {
+            const count = customizingItem.name.includes('Half-Dozen') ? 6 : 12;
+            const perOptionCount = Math.floor(count / customOptions.length);
+            distribution[option] = perOptionCount;
+            return distribution;
+        }, {});
     
         const customizedItem = {
             name: customizingItem.name.includes('Half-Dozen') ? '1/2 Dozen Bagels' : 'Dozen Bagels',
@@ -400,7 +400,8 @@ const App = () => {
                 element={
                     <Checkout
                         orderItems={orderItems}
-                        calculateTotal={() => orderItems.reduce((sum, item) => sum + item.price, 0)}
+                        setOrderItems={setOrderItems} // Ensure this is passed
+                        calculateTotal={calculateTotal}
                         handleBackToMenu={handleBackToMenu}
                     />
                 }

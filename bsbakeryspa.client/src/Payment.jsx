@@ -7,19 +7,29 @@ const Payment = ({ orderItems, total, handleBackToHome }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
 
+    const calculateDiscount = () => {
+        const loafItems = orderItems.filter((item) => item.name.includes('Loaf'));
+        const loafCount = loafItems.length;
+        const discountPerPair = 4;
+        return Math.floor(loafCount / 2) * discountPerPair;
+    };
+
+    const discount = calculateDiscount();
+    const totalAfterDiscount = total - discount;
+
     const handlePayment = () => {
-        const orderNumber = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit order number
+        const orderNumber = Math.floor(100000 + Math.random() * 900000); 
         const currentDate = new Date();
         const fulfillmentDate = new Date();
-        fulfillmentDate.setDate(currentDate.getDate() + 3); // Assume 3 days for order fulfillment
-
+        fulfillmentDate.setDate(currentDate.getDate() + 3); 
+    
         const details = {
             orderNumber,
             date: currentDate.toLocaleString(),
             fulfillmentDate: fulfillmentDate.toLocaleDateString(),
-            total: total.toFixed(2),
+            total: totalAfterDiscount.toFixed(2), 
         };
-
+    
         setOrderDetails(details);
         setIsModalOpen(true);
     };
@@ -43,19 +53,23 @@ const Payment = ({ orderItems, total, handleBackToHome }) => {
             <div className="payment-container">
                 <h1>Payment</h1>
                 <div className="order-summary">
-                    <h2>Order Summary</h2>
+                    <h2>Your Order</h2>
                     <ul>
                         {orderItems.map((item, index) => (
                             <li key={index}>
-                                {item.name} - ${item.price}
+                                {item.name} - ${item.price.toFixed(2)}
                             </li>
                         ))}
+
                     </ul>
-                    <h3>Total: ${total.toFixed(2)}</h3>
+                    <h3>Total: ${totalAfterDiscount.toFixed(2)}</h3>
+                    <p style={{ color: 'grey', fontStyle: 'italic', fontSize: '0.9em' }}>
+                        (Discount applied: -${discount.toFixed(2)})
+                    </p>
                 </div>
                 <div className="payment-actions">
-                    <button onClick={handlePayment}>Confirm Payment</button>
                     <button onClick={() => navigate('/checkout')}>Back to Checkout</button>
+                    <button onClick={handlePayment}>Confirm Payment</button>
                 </div>
             </div>
 
@@ -67,8 +81,8 @@ const Payment = ({ orderItems, total, handleBackToHome }) => {
                         <p><strong>Date:</strong> {orderDetails.date}</p>
                         <p><strong>Fulfillment Date:</strong> {orderDetails.fulfillmentDate}</p>
                         <p><strong>Total Paid:</strong> ${orderDetails.total}</p>
-                        <button onClick={handleSavePDF}>Save as PDF</button>
                         <button onClick={handleBackToHome}>Back to Home</button>
+                        <button id='save-receipt-button' onClick={handleSavePDF}>Save as PDF</button>
                     </div>
                 </div>
             )}
