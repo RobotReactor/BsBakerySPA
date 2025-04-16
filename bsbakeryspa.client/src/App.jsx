@@ -431,8 +431,9 @@ const App = () => {
                 element={
                     <Payment
                         orderItems={orderItems}
-                        total={orderItems.reduce((sum, item) => sum + item.price, 0)}
-                        handleBackToHome={handleBackToHome} 
+                        total={orderItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)}
+                        handleBackToHome={handleBackToHome}
+                        clearOrder={() => setOrderItems([])} 
                     />
                 }
             />

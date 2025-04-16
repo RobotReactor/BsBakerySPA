@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 
-const Payment = ({ orderItems, total, handleBackToHome }) => {
+const Payment = ({ orderItems, total, handleBackToHome, clearOrder }) => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
@@ -29,6 +29,8 @@ const Payment = ({ orderItems, total, handleBackToHome }) => {
             fulfillmentDate: fulfillmentDate.toLocaleDateString(),
             total: totalAfterDiscount.toFixed(2), 
         };
+
+        clearOrder();
     
         setOrderDetails(details);
         setIsModalOpen(true);
