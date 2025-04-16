@@ -520,12 +520,57 @@ body {
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 0.9rem;
+    margin-bottom: 10px;
 }
 
-.order-item span {
+.item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1; /* Allow item details to take up remaining space */
+}
+
+.quantity-remove-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Add spacing between quantity controls and the remove icon */
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Add spacing between the buttons and the quantity number */
+}
+
+.quantity-controls button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.quantity-controls button:hover {
+    background-color: #0056b3;
+}
+
+.quantity-controls span {
     font-size: 1rem;
-    color: #333;
+    font-weight: bold;
+}
+
+.remove-icon {
+    color: #ff4d4d;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.remove-icon:hover {
+    color: #ff1a1a;
 }
 
 .customize-icon {

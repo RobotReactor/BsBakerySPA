@@ -1,5 +1,6 @@
 import { useEffect, useState, React } from 'react';
 import { useNavigate, Routes, Route } from 'react-router-dom'; // Import Routes and Route
+import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import './App.css';
 import Checkout from './Checkout';
 import Payment from './Payment';
@@ -16,9 +17,7 @@ const App = () => {
     const navigate = useNavigate();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
     const [orderItems, setOrderItems] = useState([]);
-    const [total, setTotal] = useState(0);
     const [customizingItem, setCustomizingItem] = useState(null);
     const [customOptions, setCustomOptions] = useState([]); 
 
@@ -82,17 +81,9 @@ const App = () => {
         }, 0);
     };
 
-    const addItemToOrder = (item, price) => {
-        setCustomizingItem({
-            name: item.includes('Half-Dozen') ? 'Bagels (Half-Dozen)' : 'Bagels (Dozen)',
-            price,
-            options: ['Plain', 'Cheddar', 'Asiago', 'Sesame', 'Everything', 'Cheddar Jalapeño'],
-            isEditing: false, // Set the flag to false when adding a new item
-        });
-    };
-
     const addCookiesToOrder = (cookieType, price) => {
         const cookieItem = {
+            id: uuidv4(), // Generate a unique ID
             name: `Cookies (${cookieType})`,
             price: price,
         };
@@ -102,6 +93,7 @@ const App = () => {
     
     const addLoafToOrder = (loafType, price) => {
         const loafItem = {
+            id: uuidv4(), // Generate a unique ID
             name: `Loaf (${loafType})`,
             price: price,
         };
@@ -109,8 +101,15 @@ const App = () => {
         setOrderItems((prevOrderItems) => [...prevOrderItems, loafItem]);
     };
 
-    const removeItemFromOrder = (index) => {
-        setOrderItems((prevOrderItems) => prevOrderItems.filter((_, i) => i !== index));
+    const addBagelsToOrder = (name, price, options) => {
+        const newItem = {
+            id: uuidv4(), // Generate a unique ID
+            name,
+            price,
+            options,
+        };
+    
+        setOrderItems((prevOrderItems) => [...prevOrderItems, newItem]);
     };
 
     const handleOptionChange = (e, option) => {
@@ -125,22 +124,6 @@ const App = () => {
             }
         } else {
             setCustomOptions(customOptions.filter((opt) => opt !== option)); 
-        }
-    };
-
-    const handleCustomizeItem = (index) => {
-        const itemToCustomize = orderItems[index];
-    
-        if (itemToCustomize.name.includes('Bagels')) {
-            setCustomizingItem({
-                index,
-                name: itemToCustomize.name.includes('1/2 Dozen') ? 'Bagels (Half-Dozen)' : 'Bagels (Dozen)',
-                price: itemToCustomize.name.includes('1/2 Dozen') ? 12 : 22,
-                options: ['Plain', 'Cheddar', 'Asiago', 'Sesame', 'Everything', 'Cheddar Jalapeño'],
-                isEditing: true, 
-            });
-    
-            setCustomOptions(Object.keys(itemToCustomize.options));
         }
     };
     
@@ -162,6 +145,7 @@ const App = () => {
         }, {});
     
         const customizedItem = {
+            id: uuidv4(), // Generate a unique ID
             name: customizingItem.name.includes('Half-Dozen') ? '1/2 Dozen Bagels' : 'Dozen Bagels',
             price: totalPrice,
             options: bagelDistribution,
@@ -184,8 +168,29 @@ const App = () => {
         setCustomOptions([]);
     };
 
+    const groupOrderItems = (items) => {
+        const groupedItems = [];
+
+        items.forEach((item) => {
+            if (item.name.includes('Bagels')) {
+                groupedItems.push({ ...item });
+                return;
+            }
+
+            const existingItem = groupedItems.find((groupedItem) => groupedItem.name === item.name);
+
+            if (existingItem) {
+                existingItem.quantity = (existingItem.quantity || 1) + (item.quantity || 1);
+            } else {
+                groupedItems.push({ ...item });
+            }
+        });
+
+        return groupedItems;
+    };
+
     const calculateTotal = () => {
-        return orderItems.reduce((sum, item) => sum + item.price, 0);
+        return orderItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
     };
 
     return (
@@ -332,15 +337,30 @@ const App = () => {
                                     <div className="modal-right">
                                         <h2>Your Order</h2>
                                         <ul className="order-list">
-                                            {orderItems.map((order, index) => (
-                                                <li key={index} className="order-item">
-                                                    <span>{order.name} - ${order.price}</span>
-                                                    <FaTrashAlt
-                                                        className="remove-icon"
-                                                        onClick={() => setOrderItems((prev) => prev.filter((_, i) => i !== index))}
-                                                    />
-                                                </li>
-                                            ))}
+                                            {orderItems.flatMap((order, index) =>
+                                                Array.from({ length: order.quantity || 1 }).map((_, i) => (
+                                                    <li key={`${index}-${i}`} className="order-item">
+                                                        <span>
+                                                            {order.name} - ${order.price}
+                                                        </span>
+                                                        <FaTrashAlt
+                                                            className="remove-icon"
+                                                            onClick={() => {
+                                                                // Remove one instance of the item
+                                                                setOrderItems((prevOrderItems) => {
+                                                                    const updatedOrderItems = [...prevOrderItems];
+                                                                    if (order.quantity > 1) {
+                                                                        updatedOrderItems[index].quantity -= 1;
+                                                                    } else {
+                                                                        updatedOrderItems.splice(index, 1);
+                                                                    }
+                                                                    return updatedOrderItems;
+                                                                });
+                                                            }}
+                                                        />
+                                                    </li>
+                                                ))
+                                            )}
                                         </ul>
                                         <div className="modal-footer">
                                             <h3>Total: ${calculateTotal()}</h3>
@@ -399,8 +419,8 @@ const App = () => {
                 path="/checkout"
                 element={
                     <Checkout
-                        orderItems={orderItems}
-                        setOrderItems={setOrderItems} // Ensure this is passed
+                        orderItems={groupOrderItems(orderItems)} // Pass grouped items
+                        setOrderItems={setOrderItems}
                         calculateTotal={calculateTotal}
                         handleBackToMenu={handleBackToMenu}
                     />
