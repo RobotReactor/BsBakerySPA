@@ -67,6 +67,21 @@ const App = () => {
         }, 0);
     };
 
+    const handleBackToHome = () => {
+        if (isModalOpen) {
+            setIsModalOpen(false);
+            document.body.style.overflow = 'auto';
+        }
+
+        navigate('/');
+        setTimeout(() => {
+            const menuSection = document.getElementById('home');
+            if (menuSection) {
+                menuSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }, 0);
+    };
+
     const addItemToOrder = (item, price) => {
         setCustomizingItem({
             name: item.includes('Half-Dozen') ? 'Bagels (Half-Dozen)' : 'Bagels (Dozen)',
@@ -396,6 +411,7 @@ const App = () => {
                     <Payment
                         orderItems={orderItems}
                         total={orderItems.reduce((sum, item) => sum + item.price, 0)}
+                        handleBackToHome={handleBackToHome} 
                     />
                 }
             />

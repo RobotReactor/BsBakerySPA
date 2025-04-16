@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 
-
-const Payment = ({ orderItems, total }) => {
+const Payment = ({ orderItems, total, handleBackToHome }) => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [orderDetails, setOrderDetails] = useState(null);
@@ -22,16 +21,20 @@ const Payment = ({ orderItems, total }) => {
         };
 
         setOrderDetails(details);
-        setIsModalOpen(true); // Open the modal
+        setIsModalOpen(true);
     };
 
     const handleSavePDF = () => {
         const doc = new jsPDF();
-        doc.text('Payment Confirmation', 10, 10);
-        doc.text(`Order Number: ${orderDetails.orderNumber}`, 10, 20);
-        doc.text(`Date: ${orderDetails.date}`, 10, 30);
-        doc.text(`Fulfillment Date: ${orderDetails.fulfillmentDate}`, 10, 40);
-        doc.text(`Total Paid: $${orderDetails.total}`, 10, 50);
+        doc.text('- Payment Confirmation -', 10, 10);
+        doc.text('Thank you for your order!', 10, 30);
+        doc.text('Here are your order details:', 10, 40);
+        doc.text('_____________________________', 10, 50);
+        doc.text(`Order Number: ${orderDetails.orderNumber}`, 10, 60);
+        doc.text(`Date: ${orderDetails.date}`, 10, 70);
+        doc.text(`Fulfillment Date: ${orderDetails.fulfillmentDate}`, 10, 80);
+        doc.text(`Total Paid: $${orderDetails.total}`, 10, 90);
+        doc.text('_____________________________', 10, 100);
         doc.save('order-confirmation.pdf');
     };
 
@@ -65,7 +68,7 @@ const Payment = ({ orderItems, total }) => {
                         <p><strong>Fulfillment Date:</strong> {orderDetails.fulfillmentDate}</p>
                         <p><strong>Total Paid:</strong> ${orderDetails.total}</p>
                         <button onClick={handleSavePDF}>Save as PDF</button>
-                        <button onClick={() => navigate('/')}>Back to Home</button>
+                        <button onClick={handleBackToHome}>Back to Home</button>
                     </div>
                 </div>
             )}
