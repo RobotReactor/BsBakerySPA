@@ -1,17 +1,18 @@
 import { useEffect, useState, React } from 'react';
 import { useNavigate, Routes, Route } from 'react-router-dom'; // Import Routes and Route
+import { FaUser, FaShoppingCart, FaArrowDown, FaTrashAlt, FaTimes, FaSignInAlt } from 'react-icons/fa';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 import './App.css';
+import { useAuth } from "./hooks/useAuth";
 import Checkout from './Checkout';
 import Payment from './Payment';
-import { FaUser, FaShoppingCart, FaArrowDown, FaTrashAlt, FaTimes } from 'react-icons/fa';
+import LoginPage from './LoginPage';
+import UserPage from './userPage';
 import logo from '../src/assets/logo.jpg';
 import bagels from '../src/assets/Bagels.jpg';
 import loafs from '../src/assets/Loafs.jpg';
 import cookies from '../src/assets/Cookies.jpg';
 import baked_goods from '../src/assets/baked_goods.jpg';
-
-
 
 const App = () => {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ const App = () => {
     const [orderItems, setOrderItems] = useState([]);
     const [customizingItem, setCustomizingItem] = useState(null);
     const [customOptions, setCustomOptions] = useState([]); 
-
+    const { user, guestSignIn, logout } = useAuth();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -211,7 +212,22 @@ const App = () => {
                                 </ul>
                             </div>
                             <div className="navbar-right">
-                                <FaUser className="icon" id="userIcon" />
+                            { user ? (
+                                <>
+                                    <span className="welcome-message">Welcome, {user.displayName || "Guest"}!</span>
+                                    <FaUser
+                                            className="icon"
+                                            id="userIcon"
+                                            onClick={() => navigate('/user')}
+                                    />
+                                </>
+                            ) : (
+                                <FaSignInAlt
+                                    className="icon"
+                                    id="faSignInIcon"
+                                    onClick={() => navigate('/login')} // Navigate to the User Page
+                                />
+                            )}
                                 <FaShoppingCart className="icon" id="cartIcon" onClick={() => navigate('/checkout')} />
                             </div>
                         </nav>
@@ -437,6 +453,8 @@ const App = () => {
                     />
                 }
             />
+            <Route path="/user" element={<UserPage />} />
+            <Route path="/login" element={<LoginPage />} />
         </Routes>
     );
 };

@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
+    "firebase": "^11.6.0",
     "jspdf": "^3.0.1",
     "react-router-dom": "^7.5.0",
     "uuid": "^11.1.0"

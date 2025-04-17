@@ -1,0 +1,12 @@
+specVersion: "v1"
+serviceId: "bsbakeryspa"
+location: "us-east1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "postgres"
+      cloudSql:
+        instanceId: "bsbakeryspa-fdc"
+      # schemaValidation: "COMPATIBLE"
+connectorDirs: ["./connector"]

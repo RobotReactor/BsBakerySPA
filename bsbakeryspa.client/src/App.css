@@ -1076,3 +1076,130 @@ body {
 #save-receipt-button:hover {
     background-color: #e68900;
 }
+
+.user-page {
+    padding: 20px;
+    text-align: center;
+}
+
+.user-page h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.user-page p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.user-page button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.user-page button:hover {
+    background-color: #0056b3;
+}
+
+.welcome-message {
+    font-size: 1rem;
+    color: #333;
+    margin-right: 1rem;
+}
+
+.login-page {
+    text-align: center;
+    padding: 20px;
+    background-color: #fafafa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    color: #333;
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-page h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #d2691e; /* Warm bakery-themed color */
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    color: black;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: #d2691e;
+    box-shadow: 0 0 5px rgba(210, 105, 30, 0.5);
+}
+
+.login-button,
+.guest-button,
+.back-button {
+    background-color: #d2691e; /* Warm bakery-themed color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-button:hover,
+.guest-button:hover,
+.back-button:hover {
+    background-color: #a0522d; /* Darker shade for hover effect */
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.guest-button {
+    margin-top: 10px;
+    background-color: #ff9800; /* Different color for guest button */
+}
+
+.guest-button:hover {
+    background-color: #e68900;
+}
+
+.back-button {
+    margin-top: 20px;
+    background-color: #007bff; /* Blue for back button */
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
