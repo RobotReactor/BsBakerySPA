@@ -399,7 +399,6 @@ const App = () => {
                                             </li>
                                         ))}
                                     </ul>
-                                    <button onClick={confirmCustomization}>Add to Order</button>
                                     <button
                                         onClick={() => {
                                             setCustomizingItem(null);
@@ -408,6 +407,7 @@ const App = () => {
                                     >
                                         Cancel
                                     </button>
+                                    <button onClick={confirmCustomization}>Add to Order</button>
                                 </div>
                             </div>
                         )}

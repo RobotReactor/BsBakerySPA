@@ -10,11 +10,6 @@ const Checkout = ({ orderItems, setOrderItems, calculateTotal, handleBackToMenu 
         const groupedItems = [];
     
         items.forEach((item) => {
-            if (item.name.includes('Bagels')) {
-                groupedItems.push({ ...item });
-                return;
-            }
-    
             const existingItem = groupedItems.find((groupedItem) => groupedItem.name === item.name);
     
             if (existingItem) {
@@ -26,17 +21,18 @@ const Checkout = ({ orderItems, setOrderItems, calculateTotal, handleBackToMenu 
     
         return groupedItems;
     };
-
+    
     // Function to check if the bagel count is correct
     const isBagelCountCorrect = (options, totalBagels) => {
         const currentTotal = Object.values(options || {}).reduce((sum, count) => sum + count, 0);
         return currentTotal === totalBagels;
     };
-
-    // Group items when the component loads or when orderItems changes
+    
+    // Use the grouping function when rendering groupedOrderItems
     useEffect(() => {
         setGroupedOrderItems(groupOrderItems(orderItems));
     }, [orderItems]);
+
 
     const calculateDiscount = () => {
         const loafItems = groupedOrderItems.filter((item) => item.name.includes('Loaf'));
@@ -56,27 +52,34 @@ const Checkout = ({ orderItems, setOrderItems, calculateTotal, handleBackToMenu 
     const discount = calculateDiscount();
     const totalAfterDiscount = calculateTotal() - discount;
 
-    const handleQuantityChange = (index, change) => {
+    const handleQuantityChange = (itemId, change) => {
         setOrderItems((prevOrderItems) => {
-            const updatedOrderItems = [...prevOrderItems];
-            const item = { ...updatedOrderItems[index] };
-
-            // Update quantity
-            item.quantity = (item.quantity || 1) + change;
-
-            // Prevent quantity from going below 1
-            if (item.quantity < 1) {
-                updatedOrderItems.splice(index, 1);
-            } else {
-                updatedOrderItems[index] = item;
-            }
-
+            const updatedOrderItems = prevOrderItems.map((item) => {
+                if (item.id === itemId) {
+                    const updatedQuantity = (item.quantity || 1) + change;
+    
+                    // Prevent quantity from going below 1
+                    if (updatedQuantity < 1) {
+                        return null; // Mark item for removal
+                    }
+    
+                    return { ...item, quantity: updatedQuantity };
+                }
+                return item;
+            }).filter(Boolean); // Remove items marked as null
+    
             return updatedOrderItems;
         });
     };
 
-    const handleRemoveItem = (index) => {
-        setOrderItems((prevOrderItems) => prevOrderItems.filter((_, i) => i !== index));
+    const handleRemoveItem = (identifier, itemid, isBagel = false) => {
+        setOrderItems((prevOrderItems) => {
+            if (isBagel) {
+                return prevOrderItems.filter((item) => item.id !== itemid);
+            } else {
+                return prevOrderItems.filter((item) => item.name !== identifier);
+            }
+        });
     };
 
     const handleToppingChange = (itemId, topping, change) => {
@@ -118,76 +121,97 @@ const Checkout = ({ orderItems, setOrderItems, calculateTotal, handleBackToMenu 
                     <div className="order-list-container">
                         {groupedOrderItems.length > 0 ? (
                             <ul>
-                                {groupedOrderItems.map((item, index) => (
-                                    <li key={index} className="order-item">
-                                        <div className="item-details">
-                                            <strong>
-                                                {item.name} - ${item.price} x {item.quantity || 1}{' '}
-                                                {item.options &&
-                                                    item.name.includes('Dozen') &&
-                                                    !item.name.includes('1/2') &&
-                                                    (Object.keys(item.options).length === 2 || Object.keys(item.options).length === 3) && (
-                                                        isBagelCountCorrect(item.options, item.name.includes('1/2') ? 6 : 12) ? (
-                                                            <span style={{ color: 'green' }}>✔</span>
-                                                        ) : (
-                                                            <span style={{ color: 'red' }}>✘</span>
-                                                        )
-                                                    )}
-                                            </strong>
-                                            {item.options && item.name.includes('Bagels') ? (
-                                                <ul className="bagel-options">
-                                                    {Object.entries(item.options).map(([type, count], idx) => (
-                                                        <li key={idx}>
-                                                            <label>
-                                                                {type}:{' '}
-                                                                {!item.name.includes('1/2') && (
-                                                                    <>
-                                                                        <button
-                                                                            className="subtract"
-                                                                            onClick={() => handleToppingChange(item.id, type, -1)} // Use item.id here
-                                                                            disabled={count <= 3}
-                                                                        >
-                                                                            -1
-                                                                        </button>
-                                                                        <span>{count}</span>
-                                                                        <button
-                                                                            className="add"
-                                                                            onClick={() => handleToppingChange(item.id, type, 1)} // Use item.id here
-                                                                            disabled={
-                                                                                Object.values(item.options).reduce((sum, c) => sum + c, 0) >=
-                                                                                (item.name.includes('1/2') ? 6 : 12)
-                                                                            }
-                                                                        >
-                                                                            +1
-                                                                        </button>
-                                                                    </>
-                                                                )}
-                                                                {item.name.includes('1/2') && <span>{count}</span>}
-                                                            </label>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <div className="quantity-remove-container">
-                                                    <div className="quantity-controls">
-                                                        <button
-                                                            onClick={() => handleQuantityChange(index, -1)}
-                                                            disabled={item.quantity <= 1}
-                                                        >
-                                                            -
-                                                        </button>
-                                                        <span>{item.quantity || 1}</span>
-                                                        <button onClick={() => handleQuantityChange(index, 1)}>+</button>
+                                {groupedOrderItems.map((item) => {
+                                    const isProblematic =
+                                        item.options &&
+                                        item.name.includes('Dozen') &&
+                                        !item.name.includes('1/2') &&
+                                        !isBagelCountCorrect(item.options, 12);
+
+                                    return (
+                                        <li 
+                                            key={item.id} 
+                                            className={`order-item ${isProblematic ? 'problematic-item' : ''}`} // Apply the problematic class if needed
+                                            >
+                                            <div className="item-details">
+                                                {isProblematic && (
+                                                    <div className="problem-banner">
+                                                        Bagel toppings must add up to 12 total.
                                                     </div>
-                                                    <FaTrashAlt
-                                                        className="remove-icon"
-                                                        onClick={() => handleRemoveItem(index)}
-                                                    />
+                                                )}
+                                                <div className="item-header">
+                                                    <strong className='dozen-toppings'>
+                                                        {item.name} - ${item.price} x {item.quantity || 1}{' '}
+                                                        {item.options &&
+                                                            item.name.includes('Dozen') &&
+                                                            !item.name.includes('1/2') &&
+                                                            (Object.keys(item.options).length === 2 || Object.keys(item.options).length === 3) && (
+                                                                isBagelCountCorrect(item.options, item.name.includes('1/2') ? 6 : 12) ? (
+                                                                    <span style={{ color: 'green' }}>✔</span>
+                                                                ) : (
+                                                                    <span style={{ color: 'red' }}>✘</span>
+                                                                )
+                                                            )}
+                                                    </strong>
+                                                    {item.options && item.name.includes('Bagels') ? (
+                                                        <ul className="bagel-options">
+                                                            {Object.entries(item.options).map(([type, count], idx) => (
+                                                                <li key={idx} className="bagel-option">
+                                                                    <li key={idx}>
+                                                                        <div>
+                                                                        <span className="bagel-topping-name">{type}: {count}</span>
+                                                                            {!item.name.includes('1/2') && Object.keys(item.options).length !== 1 && Object.keys(item.options).length !== 4 && (
+                                                                                <div className="bagel-topping-controls">
+                                                                                    <button
+                                                                                        className="small-button subtract"
+                                                                                        onClick={() => handleToppingChange(item.id, type, -1)} // Use item.id here
+                                                                                        disabled={count <= 3}
+                                                                                    >
+                                                                                        -1
+                                                                                    </button>
+                                                                                    <button
+                                                                                        className="small-button add"
+                                                                                        onClick={() => handleToppingChange(item.id, type, 1)} // Use item.id here
+                                                                                        disabled={
+                                                                                            Object.values(item.options).reduce((sum, c) => sum + c, 0) >=
+                                                                                            (item.name.includes('1/2') ? 6 : 12)
+                                                                                        }
+                                                                                    >
+                                                                                        +1
+                                                                                    </button>
+                                                                                </div>
+                                                                            )}
+                                                                            {item.name.includes('1/2')}
+                                                                        </div>
+                                                                    </li>
+                                                                    
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                        
+                                                    ) : (
+                                                        <div className="quantity-controls">
+                                                            <button
+                                                                onClick={() => handleQuantityChange(item.id, -1)}
+                                                                disabled={item.quantity <= 1}
+                                                            >-</button>
+                                                            <span>{item.quantity || 1}</span>
+                                                            <button 
+                                                                onClick={() => handleQuantityChange(item.id, 1)}
+                                                            >+</button>
+                                                        </div>
+                                                    )}
+                                                    <div className="remove-icon-container">
+                                                        <FaTrashAlt
+                                                            className="remove-icon"
+                                                            onClick={() => handleRemoveItem(item.name, item.id, item.name.includes('Bagels'))} 
+                                                        />
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </div>
-                                    </li>
-                                ))}
+                                            </div>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         ) : (
                             <p className="empty-cart-message">

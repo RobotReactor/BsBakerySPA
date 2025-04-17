@@ -9,7 +9,7 @@ const Payment = ({ orderItems, total, handleBackToHome, clearOrder }) => {
 
     const calculateDiscount = () => {
         const loafItems = orderItems.filter((item) => item.name.includes('Loaf'));
-        const loafCount = loafItems.length;
+        const loafCount = loafItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
         const discountPerPair = 4;
         return Math.floor(loafCount / 2) * discountPerPair;
     };
@@ -51,7 +51,7 @@ const Payment = ({ orderItems, total, handleBackToHome, clearOrder }) => {
     };
 
     return (
-        <div className="payment-page">
+        <div className="payment-page"> 
             <div className="payment-container">
                 <h1>Payment</h1>
                 <div className="order-summary">

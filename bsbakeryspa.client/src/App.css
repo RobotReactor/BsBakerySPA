@@ -514,8 +514,7 @@ body {
 
 .order-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     background-color: #f9f9f9;
     padding: 10px;
     border-radius: 5px;
@@ -526,52 +525,44 @@ body {
 .item-details {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    flex: 1; /* Allow item details to take up remaining space */
+    gap: 10px;
 }
 
-.quantity-remove-container {
+.item-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    gap: 10px; /* Add spacing between quantity controls and the remove icon */
 }
+
 
 .quantity-controls {
     display: flex;
     align-items: center;
-    gap: 5px; /* Add spacing between the buttons and the quantity number */
+    gap: 5px;
+    justify-content: end;
+    flex: 1;
 }
 
-.quantity-controls button {
+.small-button {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.quantity-controls button:hover {
+.small-button:hover:not(:disabled) {
     background-color: #0056b3;
 }
 
-.quantity-controls span {
-    font-size: 1rem;
-    font-weight: bold;
+.small-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
-.remove-icon {
-    color: #ff4d4d;
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
-}
-
-.remove-icon:hover {
-    color: #ff1a1a;
-}
 
 .customize-icon {
     color: #007bff;
@@ -585,15 +576,22 @@ body {
     color: #0056b3;
 }
 
+.remove-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 20px; /* Space between customize and remove icon */
+}
+
 .remove-icon {
-    color: #ff4d4d;
     cursor: pointer;
     font-size: 1.2rem;
+    color: #ff4d4d;
     transition: color 0.3s ease;
 }
 
 .remove-icon:hover {
-    color: #ff1a1a;
+    color: #ff0000;
 }
 
 .modal-footer {
@@ -785,51 +783,123 @@ body {
 }
 
 .bagel-options {
-    list-style: none;
-    margin: 10px 0;
-    padding: 0;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
     gap: 10px;
+    margin-top: 5px;
+    padding: 0;
+    list-style: none;
+    flex-wrap: nowrap;
+}
+
+.bagel-option {
+    display: flex;
+    justify-content: space-between; /* Space between topping name and buttons */
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem;
     justify-content: center;
 }
 
-.bagel-options li {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 0.9rem;
-    color: #555;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    min-width: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
+.bagel-topping-name {
+    font-size: .7rem;
+    color: #333;
+    font-weight: bold;
+    text-wrap: nowrap;
 }
 
-.bagel-options button {
+.bagel-topping-controls {
+    display: flex;
+    gap: 5px; /* Space between the buttons */
+    justify-content: center;
+}
+
+.bagel-topping-controls .small-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.bagel-topping-controls .small-button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.bagel-topping-controls .small-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    color: #666;
+}
+
+.dozen-toppings {
+    font-size: 1rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.problematic-item {
+    background-color: #ffe6e6; /* Light red background */
+    border: 1px solid #ff4d4d; /* Optional: Red border for emphasis */
+    transition: background-color 0.3s ease; /* Smooth transition for better UX */
+}
+
+.problematic-item:hover {
+    background-color: #ffcccc; /* Slightly darker red on hover */
+}
+
+.problem-banner {
+    background-color: #ffcccc; /* Light red background */
+    color: #b30000; /* Dark red text */
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quantity-controls button {
     background-color: #007bff; /* Blue background */
     color: white; /* White text */
     border: none;
+    height: 20px;
     padding: 5px 10px; /* Adjust padding for better size */
     border-radius: 5px;
     font-size: 0.85rem; /* Slightly larger font size */
     cursor: pointer;
-    margin: 0 5px; /* Add gap between buttons */
     transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 20px; /* Full width for buttons */
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
 }
 
-.bagel-options button:hover:not(:disabled) {
+.quantity-controls button:hover:not(:disabled) {
     background-color: #0056b3; /* Darker blue on hover */
 }
 
-.bagel-options button:disabled {
+.quantity-controls button:disabled {
     background-color: #ccc; 
     cursor: not-allowed;
     color: #666;
+}
+
+.topping-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 5px;
+    padding: 0;
+    list-style: none;
 }
 
 .checkout-actions {
