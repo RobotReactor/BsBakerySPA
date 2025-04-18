@@ -214,7 +214,7 @@ const App = () => {
                             <div className="navbar-right">
                             { user ? (
                                 <>
-                                    <span className="welcome-message">Welcome, {user.displayName || "Guest"}!</span>
+                                    <span className="welcome-message">Welcome, {user.name}!</span>
                                     <FaUser
                                             className="icon"
                                             id="userIcon"

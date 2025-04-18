@@ -1125,6 +1125,9 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    max-width: 400px; /* Limit the width */
+    min-height: 300px; /* Optional: Set a minimum height */
 }
 
 .login-page h1 {
@@ -1202,4 +1205,49 @@ body {
 
 .back-button:hover {
     background-color: #0056b3;
+}
+
+.login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.login-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+}
+
+.login-modal-content input {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    color: #000;
+}
+
+.login-modal-content button {
+    margin: 10px 5px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #d2691e;
+}
+
+.login-modal-content .error {
+    color: red;
+    font-size: 0.9em;
 }

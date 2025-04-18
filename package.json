@@ -5,5 +5,11 @@
     "jspdf": "^3.0.1",
     "react-router-dom": "^7.5.0",
     "uuid": "^11.1.0"
+  },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test",
+      "eject": "react-scripts eject"
   }
 }
