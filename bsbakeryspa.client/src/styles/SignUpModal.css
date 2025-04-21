@@ -1,0 +1,73 @@
+.login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.login-modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-modal-content h2 {
+    font-size: 2rem;
+    color: #d2691e;
+    margin-bottom: 20px;
+    font-family: 'Nothing You Could Do', cursive;
+}
+
+.login-modal-content input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.login-modal-content .cancel-button,
+.login-modal-content .signup-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 10px;
+}
+
+.error {
+    color: red;
+    font-size: 0.8rem;
+    margin-bottom: 15px;
+}
+
+.login-modal-content .cancel-button {
+    background-color: #dddddd;
+    color: black;
+}
+
+.login-modal-content .cancel-button:hover {
+    background-color: #e7d8c2;
+}
+
+.login-modal-content .signup-button {
+    background-color: #ff9800;
+    color: white;
+}
+
+.login-modal-content .signup-button:hover {
+    background-color: #e68900;
+}

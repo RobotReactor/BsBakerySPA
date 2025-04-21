@@ -1,0 +1,451 @@
+﻿* {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+#root {
+    margin: 0 auto;
+    text-align: center;
+}
+
+body {
+    background-image: url('C:\Users\maxwe\Documents\Github Directories\BsBakerySPA\bsbakeryspa.client\public\paper-background.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    font-family: "Nothing You Could Do", cursive;
+    color: black;
+}
+
+.nothing-you-could-do-regular {
+    font-family: "Nothing You Could Do", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.app {
+    font-family: "Nothing You Could Do", cursive;
+    text-align: center;
+}
+
+button {
+    font-family: "Nothing You Could Do", cursive;
+}
+
+
+/* Customization Modal */
+.customization-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.651);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.customization-content {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    text-align: center;
+}
+
+.customization-options {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.customization-options li {
+    margin-bottom: 10px;
+}
+
+.customization-options label {
+    font-size: 1rem;
+    color: #333;
+}
+
+.bagel-cancel-button {
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.bagel-add-button {
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff9800;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.bagel-cancel-button:hover {
+    background-color: #ffd9c3;
+}
+
+.bagel-add-button:hover {
+    background-color: #e68900;
+}
+
+/* Checkout Page */
+
+.checkout-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Full viewport height */
+    padding: 20px;
+}
+
+.checkout-container {
+    background-color: white; /* White background for the container */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    padding: 20px;
+    max-width: 600px; /* Limit the width */
+    width: 100%; /* Full width for smaller screens */
+    text-align: center;
+}
+
+.checkout-container h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.order-summary {
+    margin-bottom: 20px;
+}
+
+.checkout-container h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.order-summary {
+    margin-bottom: 20px;
+}
+
+.order-summary ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.order-summary li {
+    font-size: 1rem;
+    margin: 5px 0;
+}
+
+.order-summary li[style*="color: red"] {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.bagel-options {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 5px;
+    padding: 0;
+    list-style: none;
+    flex-wrap: nowrap;
+}
+
+.bagel-option {
+    display: flex;
+    justify-content: space-between; /* Space between topping name and buttons */
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 0.9rem;
+    justify-content: center;
+}
+
+.bagel-topping-name {
+    font-size: .7rem;
+    color: #333;
+    font-weight: bold;
+    text-wrap: nowrap;
+}
+
+.bagel-topping-controls {
+    display: flex;
+    gap: 5px; /* Space between the buttons */
+    justify-content: center;
+}
+
+.bagel-topping-controls .small-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.bagel-topping-controls .small-button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.bagel-topping-controls .small-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    color: #666;
+}
+
+.dozen-toppings {
+    font-size: 1rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.problematic-item {
+    background-color: #ffe6e6; /* Light red background */
+    border: 1px solid #ff4d4d; /* Optional: Red border for emphasis */
+    transition: background-color 0.3s ease; /* Smooth transition for better UX */
+}
+
+.problematic-item:hover {
+    background-color: #ffcccc; /* Slightly darker red on hover */
+}
+
+.problem-banner {
+    background-color: #ffcccc; /* Light red background */
+    color: #b30000; /* Dark red text */
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quantity-controls button {
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    border: none;
+    height: 20px;
+    padding: 5px 10px; /* Adjust padding for better size */
+    border-radius: 5px;
+    font-size: 0.85rem; /* Slightly larger font size */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 20px; /* Full width for buttons */
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.quantity-controls button:hover:not(:disabled) {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.quantity-controls button:disabled {
+    background-color: #ccc; 
+    cursor: not-allowed;
+    color: #666;
+}
+
+.topping-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 5px;
+    padding: 0;
+    list-style: none;
+}
+
+.checkout-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.checkout-actions button {
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.checkout-actions button:hover {
+    background-color: #ffd9c3;
+}
+
+.checkout-actions button:nth-child(2) {
+    background-color: #ff9800;
+    color: rgb(255, 255, 255);
+
+}
+
+.checkout-actions button:nth-child(2):hover {
+    background-color: #e68900;
+}
+
+.checkout-actions button:disabled {
+    background-color: #ccc; /* Grey background for disabled button */
+    color: #666; /* Grey text for disabled button */
+    cursor: not-allowed; /* Show "not-allowed" cursor */
+}
+
+.checkout-actions button:disabled:hover {
+    background-color: #ccc; /* Prevent hover effect on disabled button */
+}
+
+.order-list-container {
+    max-height: 300px; /* Limit the height of the list container */
+    overflow-y: auto; /* Add vertical scrolling */
+    border: 1px solid #ddd; /* Optional: Add a border */
+    padding: 10px; /* Add padding inside the container */
+    background-color: #f9f9f9; /* Optional: Light background */
+    border-radius: 5px; /* Optional: Rounded corners */
+}
+
+.empty-cart-message {
+    font-size: 1.2rem;
+    color: #555;
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Payment Page */
+
+.payment-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.payment-container {
+    background-color: white;
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px; 
+    width: 100%;
+    text-align: center;
+}
+
+.payment-container h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.payment-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.payment-actions button {
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.payment-actions button:hover {
+    background-color: #ffd9c3;
+}
+
+.payment-actions button:nth-child(2) {
+    background-color: #ff9800;
+    color: rgb(255, 255, 255);
+}
+
+.payment-actions button:nth-child(2):hover {
+    background-color: #e68900;
+}
+
+.payment-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.payment-modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+.payment-modal-content h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.payment-modal-content p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: #555;
+}
+
+.payment-modal-content button {
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.payment-modal-content button:hover {
+    background-color: #ffd9c3;
+}
+
+#save-receipt-button {
+    background-color: #ff9800;
+    color: rgb(255, 255, 255);
+}
+
+#save-receipt-button:hover {
+    background-color: #e68900;
+}

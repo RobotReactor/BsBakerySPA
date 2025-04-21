@@ -6,20 +6,28 @@ const Checkout = ({ orderItems, setOrderItems, calculateTotal, handleBackToMenu 
     const navigate = useNavigate();
     const [groupedOrderItems, setGroupedOrderItems] = useState([]);
 
-    const groupOrderItems = (items) => {
-        const groupedItems = [];
+    const groupOrderItems = (orderItems) => {
+        const grouped = [];
     
-        items.forEach((item) => {
-            const existingItem = groupedItems.find((groupedItem) => groupedItem.name === item.name);
+        orderItems.forEach((item) => {
+            // Check if an identical item already exists in the grouped array
+            const existingItem = grouped.find(
+                (groupedItem) =>
+                    groupedItem.name === item.name &&
+                    JSON.stringify(groupedItem.options) === JSON.stringify(item.options) &&
+                    groupedItem.size === item.size // Ensure size is considered for grouping
+            );
     
             if (existingItem) {
+                // If the item exists, increase its quantity
                 existingItem.quantity = (existingItem.quantity || 1) + (item.quantity || 1);
             } else {
-                groupedItems.push({ ...item });
+                // Otherwise, add the item to the grouped array
+                grouped.push({ ...item });
             }
         });
     
-        return groupedItems;
+        return grouped;
     };
     
     // Function to check if the bagel count is correct
@@ -37,7 +45,7 @@ const Checkout = ({ orderItems, setOrderItems, calculateTotal, handleBackToMenu 
     const calculateDiscount = () => {
         const loafItems = groupedOrderItems.filter((item) => item.name.includes('Loaf'));
         const loafCount = loafItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
-        const discountPerPair = 4; // $4 discount for every 2 loaves
+        const discountPerPair = 4; 
         return Math.floor(loafCount / 2) * discountPerPair;
     };
 
@@ -110,6 +118,12 @@ const Checkout = ({ orderItems, setOrderItems, calculateTotal, handleBackToMenu 
     
             return updatedOrderItems;
         });
+    };
+
+    const handleContinueShopping = () => {
+
+        navigate('/');
+        setTimeout(() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' }), 50);
     };
 
     return (
@@ -227,9 +241,15 @@ const Checkout = ({ orderItems, setOrderItems, calculateTotal, handleBackToMenu 
                     )}
                 </div>
                 <div className="checkout-actions">
-                    <button onClick={handleBackToMenu}>Back to Menu</button>
+                    <button onClick={handleContinueShopping}>Back to Menu</button>
                     <button
-                        onClick={() => navigate('/payment', { state: { orderItems, total: totalAfterDiscount } })}
+                        onClick={() => navigate('/payment', {
+                            state: {
+                                orderItems: groupedOrderItems,
+                                total: totalAfterDiscount, // This is calculateTotal() - discount
+                                discount: discount         // This is calculateDiscount()
+                            }
+                        })}
                         disabled={!canProceedToPayment || groupedOrderItems.length === 0}
                     >
                         Proceed to Payment

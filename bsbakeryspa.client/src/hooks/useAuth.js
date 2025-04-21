@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import app from "../firebaseConfig"; // Import the initialized Firebase app
+import app from "../components/FireBase/firebaseConfig";
+
 import {
     getAuth,
     onAuthStateChanged,
@@ -11,15 +12,15 @@ import {
 
 export const useAuth = () => {
     const [user, setUser] = useState(null);
-    const auth = getAuth(app); // Use the initialized app
+    const auth = getAuth(app);
 
-    // Track authentication state
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser);
+            setUser(currentUser); 
         });
-        return () => unsubscribe();
-    }, [auth]);
+        return () => unsubscribe(); 
+    }, []);
 
     // Login with email and password
     const login = async (email, password) => {

@@ -1,0 +1,528 @@
+#menu {
+    scroll-margin-top: 90px; 
+}
+
+/* === Home Section Styles === */
+
+.home {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.heroContainer {
+    height: 100vh;
+    position: relative;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.homeSpacer {
+    height: 0px;
+}
+
+.heroTitle {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding-bottom: 40px;
+}
+
+.bakedGoods {
+    height: auto;
+    width: 70%;
+    display: block;
+    margin: 0 auto;
+    margin-top: 270px;
+}
+
+.homeBottomText { /* Converted from ID */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    top: -30px; /* Note: 'top' might not work as expected without position context */
+}
+
+.arrowDownIcon { /* Converted from ID */
+    font-size: 1.5rem;
+    color: black;
+    padding-left: 10px;
+    font-weight: 100;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-top: -50px;
+}
+
+.heroText:nth-child(1) {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    position: relative;
+    color: black;
+}
+
+.heroText:nth-child(2) {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    position: relative;
+    color: black;
+}
+
+.heroText p {
+    margin: 0;
+    font-size: 1.4rem;
+    margin-top: -50px;
+}
+
+/* === Menu Section Styles === */
+.menu {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 80vw;
+    margin: 2rem auto;
+}
+
+.menu-header h2 {
+    font-size: 4rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    font-variant: small-caps;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    width: 850px;
+    height: 320px;
+}
+
+    .menu-item:nth-child(even) {
+        flex-direction: row-reverse;
+    }
+
+.menu-image {
+    width: 240px;
+    height: auto;
+    margin: 0 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.menu-text {
+    flex: 1;
+    text-align: center;
+    margin: 0 auto;
+    max-width: auto;
+}
+
+    .menu-text h2 {
+        margin: 0 0 1rem;
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .menu-text p {
+        margin: 0 0 1rem;
+        font-size: 1.5rem;
+        color: #666;
+        margin-top: -20px;
+    }
+
+    .menu-text ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .menu-text ul li::before {
+            content: "- ";
+            color: #666;
+            margin-right: 0.5rem;
+        }
+
+        .menu-text ul li {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .order-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #edc8f5;
+            color: rgb(0, 0, 0);
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            z-index: 10;
+        }
+        
+        .order-button:hover {
+            background-color: #ec84fa;
+        }
+
+
+/* === Order Modal Styles === */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Darkened background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Ensure it's below customization modal */
+}
+
+.modalContent {
+    position: relative;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    max-width: 1200px;
+    height: 600px;
+}
+
+/* Close Icon */
+.modalCloseIcon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 2rem;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    z-index: 20;
+}
+
+.modalCloseIcon:hover {
+    color: #ff9800;
+}
+
+.modalLeft,
+.modalRight {
+    /* Removed redundant background/shadow/radius from here as .modalContent handles it */
+    overflow-y: auto;
+    padding: 20px;
+    flex: 1;
+}
+
+.modalLeft {
+    border-right: 1px solid #e0e0e0; /* Divider between columns */
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between items */
+}
+
+.modalLeft h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.modalItem {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modalItem h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
+    text-align: center;
+}
+
+.modalItem button {
+    background-color: #fddeae;
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modalItem button:hover {
+    background-color: #e7d8c2;
+}
+
+.modalItem ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.modalItem ul li {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.modalItem ul li:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.loafOptions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.loafOptions li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.loafOptions li:hover {
+    color: rgb(49, 49, 49); /* Consider a background change too */
+}
+
+.cookieOptions {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cookieOptions li {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Added color transition */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cookieOptions li:hover {
+    background-color: #ff9800;
+    color: white;
+}
+
+.modalRight {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    overflow: hidden; /* Prevents content spill */
+    position: relative; /* Needed for absolute positioning of footer */
+}
+
+.modalRight h2 { /* Added styling for consistency */
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.orderList {
+    /* Removed grid layout - simpler list for preview */
+    overflow-y: auto;
+    /* Adjust max-height dynamically or set a fixed one */
+    max-height: calc(100% - 120px); /* Example: leaves space for title and footer */
+    padding: 0;
+    margin: 0 0 60px 0; /* Space for footer */
+    list-style: none;
+}
+
+.orderItem {
+    display: flex;
+    justify-content: space-between; /* Puts remove icon at the end */
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.removeIcon {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ff4d4d;
+    transition: color 0.3s ease;
+    margin-left: 10px; /* Space between item text and icon */
+}
+
+.removeIcon:hover {
+    color: #ff0000;
+}
+
+.modalFooter {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.modalFooter h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0;
+}
+
+/* Renamed to avoid conflict with global .checkoutButton if it exists */
+.modalCheckoutButton {
+    background-color: #4CAF50; /* Green for checkout */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.modalCheckoutButton:hover {
+    background-color: #45a049;
+}
+
+/* === Customization Modal Styles === */
+.customizationModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.651);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20; /* Higher than order modal */
+}
+
+.customizationContent {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    text-align: center;
+}
+
+.customizationOptions {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    text-align: left; /* Align checkboxes/labels */
+}
+
+.customizationOptions li {
+    margin-bottom: 10px;
+}
+
+.customizationOptions label {
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer; /* Make label clickable */
+    display: inline-flex; /* Align checkbox and text */
+    align-items: center;
+    gap: 8px; /* Space between checkbox and text */
+}
+
+.bagelCancelButton {
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.bagelAddButton {
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff9800;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.bagelCancelButton:hover {
+    background-color: #ffd9c3;
+}
+
+.bagelAddButton:hover:not(:disabled) { /* Add :not(:disabled) */
+    background-color: #e68900;
+}
+
+.bagelAddButton:disabled { /* Style for disabled state */
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+

@@ -1,0 +1,29 @@
+.user-page {
+    padding: 20px;
+    text-align: center;
+}
+
+.user-page h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.user-page p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.user-page button {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.user-page button:hover {
+    background-color: #e68900;
+}

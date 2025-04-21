@@ -1,0 +1,149 @@
+/* Login Page */
+.login-page {
+  display: flex;
+  flex-direction: column; /* Keep this */
+  align-items: center; /* Center container horizontally */
+  justify-content: center; /* Center container vertically */
+  min-height: 100vh; /* Use min-height to ensure it takes at least full screen */
+  padding: 20px;
+  text-align: center;
+}
+
+.login-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+  text-align: center;
+  width: 90%;
+  max-width: 450px;
+  background-color: rgb(253, 253, 253);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  gap: 15px; 
+}
+
+.login-page h1 {
+  font-size: 2.5rem;
+  color: #111111;
+  margin: 0;
+  font-family: 'Nothing You Could Do', cursive;
+}
+
+.message-placeholder {
+  height: 45px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.success-message,
+.error-message {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 10px 15px;
+  border-radius: 5px;
+  margin: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.login-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; 
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 10px; 
+}
+
+.login-page input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-family: 'Nothing You Could Do', cursive; 
+}
+.name-fields {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0px;
+  margin-top: 40px;
+}
+
+.login-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-page input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.login-page .login-button,
+.login-page .start-signup-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ff9800;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+}
+
+.login-page .guest-button {
+  display: none;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #ff9800;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+}
+
+.login-page .back-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #dddddd;
+  color: rgb(0, 0, 0);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 5px;
+}
+
+.login-page .login-button:hover,
+.login-page .start-signup-button:hover,
+.login-page .guest-button:hover,
+.login-page .back-button:hover {
+  background-color: #e68900;
+}
+
+.login-page .back-button:hover {
+  background-color: #e7d8c2;
+}
