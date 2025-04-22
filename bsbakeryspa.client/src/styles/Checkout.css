@@ -3,46 +3,39 @@
     overflow: hidden;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     padding-top: 20px;
 }
 
 .checkout-container {
+    min-height: 50vh;
     width: 40%;
     max-width: 700px;
     background-color: #fff;
     padding: 20px 30px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    outline: 1px black solid;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 60px);
-    outline: 1px black solid;
-}
-
-.checkout-container h1 {
-    font-size: 2rem;
-    margin-bottom: 15px;
-    color: #333;
-    text-align: center;
+    max-height: calc(80vh - 60px);
 }
 
 .checkout-container h2 {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     margin-bottom: 15px;
-    color: #444;
-    border-bottom: 1px solid #eee;
+    color: #494949;
     padding-bottom: 10px;
 }
 
 .totals-section {
-margin-top: auto;
-padding-top: 15px;
-border-top: 1px solid #eee;
-justify-content: center;
-display: flex;
-flex-direction: column;
-align-items: center;
+    margin-top: auto;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .totals-section h3 {
@@ -92,20 +85,15 @@ align-items: center;
 .checkout-item {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* Vertically center content */
-    padding: 12px 5px; /* Adjusted padding */
-    border-bottom: 1px solid #eee; /* Separator line */
-    gap: 15px; /* Add gap between flex items */
+    align-items: center; 
+    border-bottom: 1px solid #d8d8d8; 
+    padding: 10px;
+    gap: 15px; 
+    background-color: rgb(240, 240, 240);
 }
 
 .checkout-item:last-child {
     border-bottom: none; /* Remove border for the last item */
-}
-
-.checkout-item.item-error {
-    border-left: 4px solid #dc3545; /* Make error indicator more prominent */
-    padding-left: 10px;
-    background-color: #f8d7da1a; /* Very subtle error background */
 }
 
 .item-details {
@@ -113,41 +101,12 @@ align-items: center;
     display: flex;
     flex-direction: column; /* Stack name/price and toppings */
     gap: 4px; /* Space between name/price and toppings list */
+    
 }
 
 .item-details > span { /* Target the main name/price span */
     font-weight: 500;
     color: #333;
-}
-
-.remove-item-icon {
-    cursor: pointer;
-    font-size: 1.1rem; /* Slightly smaller */
-    color: #dc3545; /* Red color */
-    transition: color 0.2s ease;
-    padding: 5px; /* Clickable area */
-    flex-shrink: 0; /* Prevent icon from shrinking */
-}
-
-.remove-item-icon:hover {
-    color: #a71d2a; /* Darker red on hover */
-}
-
-.error-text {
-    color: #dc3545;
-    font-size: 0.8em;
-    font-weight: bold;
-}
-
-.error-message {
-background-color: #f8d7da;
-color: #721c24;
-border: 1px solid #f5c6cb;
-padding: 10px 15px;
-border-radius: 5px;
-margin-bottom: 15px;
-text-align: center;
-font-size: 0.95rem;
 }
 
 .order-summary ul {
@@ -221,10 +180,9 @@ font-size: 0.95rem;
 }
 
 .order-list-container {
-overflow-y: auto;
-flex-grow: 1;
-margin-bottom: 15px;
-padding-right: 10px; 
+    overflow-y: auto;
+    flex-grow: 1;
+    border: 1px solid #ced4da; 
 }
 
 .order-list-container ul {

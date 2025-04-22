@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BsBakerySPA.Server")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef042ce2f31220e8f5d456a911b154286785a511")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3dad52a5f2b207bb95787cdcd215d80c77f07c41")]
 [assembly: System.Reflection.AssemblyProductAttribute("BsBakerySPA.Server")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BsBakerySPA.Server")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

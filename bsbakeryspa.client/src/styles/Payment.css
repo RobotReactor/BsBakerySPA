@@ -2,16 +2,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 90vh;
     padding: 20px;
+    overflow-y: hidden;
 }
 
 .payment-container {
     background-color: white;
-    border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    outline: 1px black solid;
     padding: 20px;
     max-width: 600px; 
+    max-height: 50vh;
     width: 100%;
     text-align: center;
 }
@@ -30,27 +33,31 @@
 }
 
 .payment-actions button {
-    background-color: #dddddd;
-    color: rgb(0, 0, 0);
-    border: none;
+    background-color: #e9ecef; 
+    color: #343a40;
+    border: 1px solid #ced4da; 
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .payment-actions button:hover {
-    background-color: #ffd9c3;
+    background-color: #dee2e6;
+    border-color: #adb5bd;
 }
 
 .payment-actions button:nth-child(2) {
     background-color: #ff9800;
-    color: rgb(255, 255, 255);
+    color: white;
+    border-color: #ff9800;
 }
 
 .payment-actions button:nth-child(2):hover {
     background-color: #e68900;
+    border-color: #e68900;
 }
 
 .payment-modal {
