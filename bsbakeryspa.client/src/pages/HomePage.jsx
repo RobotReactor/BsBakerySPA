@@ -1,17 +1,17 @@
 // src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaShoppingCart, FaArrowDown, FaTrashAlt, FaTimes, FaSignInAlt } from 'react-icons/fa';
+import { FaArrowDown } from 'react-icons/fa'; 
 import { v4 as uuidv4 } from 'uuid';
-// Import your components if you extract them (Navbar, OrderModal, etc.)
 
 import Navbar from '../components/NavBar/NavBar';
 import OrderModal from '../components/OrderModal/OrderModal';
-// import CustomizationModal from '../components/CustomizationModal';
-// import MenuSection from '../components/MenuSection';
-// import HomeSection from '../components/HomeSection';
-import { useAuth } from "../hooks/useAuth";
-import logo from '../assets/logo.jpg';
+import CustomizationModal from '../components/CustomizationModal/CustomizationModal';
+import CartDropdown from '../components/CartDropdown/CartDropdown';
+
+
+import { PRODUCTS, BAGEL_TOPPINGS, getAvailableToppings, getToppingById } from '../data/products';
+
 import bagels from '../assets/Bagels.jpg';
 import loafs from '../assets/Loafs.jpg';
 import cookies from '../assets/Cookies.jpg';
@@ -19,21 +19,38 @@ import baked_goods from '../assets/baked_goods.jpg';
 
 import '../styles/HomePage.css';
 
-const HomePage = ({ orderItems, setOrderItems, calculateTotal }) => {
+const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity, onUpdateBagelDistribution }) => {
     const navigate = useNavigate();
-    const [isScrolled, setIsScrolled] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [customizingItem, setCustomizingItem] = useState(null);
-    const [customOptions, setCustomOptions] = useState([]);
+    const [customizingItem, setCustomizingItem] = useState(null); 
+    const [selectedToppingIds, setSelectedToppingIds] = useState([]); 
+    const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 0);
-        const handleKeyDown = (e) => {
-            if (e.key === 'Escape') {
-                if (customizingItem) setCustomizingItem(null);
-                else if (isModalOpen) toggleModal();
+        const handleScroll = () => {
+            const scrolled = window.scrollY > 0;
+            setIsScrolled(scrolled);
+
+            if (isCartDropdownOpen) {
+                setIsCartDropdownOpen(false);
             }
         };
+
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                if (customizingItem) {
+                    closeCustomization();
+                } else if (isModalOpen) {
+                    toggleModal();
+                } else if (isCartDropdownOpen) {
+                    setIsCartDropdownOpen(false);
+                }
+            }
+        };
+
+        if (isModalOpen && isCartDropdownOpen) {
+            setIsCartDropdownOpen(false);
+        }
 
         window.addEventListener('scroll', handleScroll);
         window.addEventListener('keydown', handleKeyDown);
@@ -41,97 +58,196 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal }) => {
             window.removeEventListener('scroll', handleScroll);
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isModalOpen, customizingItem]); // Add customizingItem dependency
+    }, [isModalOpen, customizingItem, isCartDropdownOpen]);
+
+    const [isScrolled, setIsScrolled] = useState(false); 
 
     const toggleModal = () => {
-        setIsModalOpen(!isModalOpen);
-        document.body.style.overflow = !isModalOpen ? 'hidden' : 'auto'; // Corrected logic
+        const opening = !isModalOpen;
+        setIsModalOpen(opening);
+        if (opening) {
+            setIsCartDropdownOpen(false);
+        }
+        document.body.style.overflow = opening ? 'hidden' : 'auto';
     };
 
-    // --- Add/Customize Item Functions (addCookiesToOrder, etc.) ---
-    const addCookiesToOrder = (cookieType, price) => {
-        const cookieItem = { id: uuidv4(), name: `Cookies (${cookieType})`, price, quantity: 1 };
+    const toggleCartDropdown = () => {
+        if (!isModalOpen) {
+            setIsCartDropdownOpen(prev => {
+                return !prev;
+            });
+        } else {
+            // Log if the modal is blocking the dropdown
+            console.log('[DEBUG] OrderModal is open, preventing cart dropdown toggle.');
+        }
+    };
+
+    const closeCartDropdown = () => {
+        setIsCartDropdownOpen(false);
+    };
+
+    const handleGoToCheckout = () => {
+        closeCartDropdown();
+        navigate('/checkout');
+    };
+
+    const addCookiesToOrder = (product) => {
+        if (!product || !product.id) {
+            console.error("Invalid product passed to addCookiesToOrder:", product);
+            return;
+        }
+        const cookieItem = {
+            lineItemId: uuidv4(),
+            productId: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: 1
+        };
         setOrderItems((prev) => [...prev, cookieItem]);
     };
-
-    const addLoafToOrder = (loafType, price) => {
-        const loafItem = { id: uuidv4(), name: `Loaf (${loafType})`, price, quantity: 1 };
+    
+    const addLoafToOrder = (product) => {
+        if (!product || !product.id) {
+            console.error("Invalid product passed to addLoafToOrder:", product);
+            return;
+        }
+        const loafItem = {
+            lineItemId: uuidv4(),
+            productId: product.id,
+            name: product.name,
+            price: product.price,
+            quantity: 1
+        };
         setOrderItems((prev) => [...prev, loafItem]);
     };
 
-    // Removed addBagelsToOrder as customization handles it
+    const startBagelCustomization = (baseBagelProduct) => {
+        setCustomizingItem(baseBagelProduct);
+        setSelectedToppingIds([]);
+    };
 
-    const handleOptionChange = (e, option) => {
-        const maxToppings = customizingItem.name.includes('Half-Dozen') ? 2 : 4;
+    const closeCustomization = () => {
+        setCustomizingItem(null);
+        setSelectedToppingIds([]);
+    };
+
+    const handleToppingChange = (e, toppingId) => {
+        // Logic remains the same...
+        const maxToppings = customizingItem.id === PRODUCTS.BAGEL_HALF.id ? 2 : 4;
         const isChecked = e.target.checked;
-        let nextOptions;
+        let nextSelectedIds;
 
         if (isChecked) {
-            if (customOptions.length < maxToppings) {
-                nextOptions = [...customOptions, option];
+            if (selectedToppingIds.length < maxToppings) {
+                nextSelectedIds = [...selectedToppingIds, toppingId];
             } else {
                 alert(`You can only select up to ${maxToppings} toppings for ${customizingItem.name}.`);
                 e.target.checked = false;
                 return;
             }
         } else {
-            nextOptions = customOptions.filter((opt) => opt !== option);
+            nextSelectedIds = selectedToppingIds.filter((id) => id !== toppingId);
         }
-        setCustomOptions(nextOptions);
+        setSelectedToppingIds(nextSelectedIds);
     };
 
-    const confirmCustomization = () => {
-        if (!customizingItem) return; // Guard clause
-
-        const requiredToppings = customizingItem.name.includes('Half-Dozen') ? 2 : 4;
-        if (customOptions.length === 0 || customOptions.length > requiredToppings) {
-             alert(`Please select between 1 and ${requiredToppings} toppings.`);
-             return;
-        }
-
+    const handleConfirmCustomization = () => {
+        if (!customizingItem) return;
+    
         const basePrice = customizingItem.price;
-        const additionalToppingCost = customOptions.filter(opt => opt !== 'Plain').length * 2;
-        const totalPrice = basePrice + additionalToppingCost;
-
-        const totalBagels = customizingItem.name.includes('Half-Dozen') ? 6 : 12;
-        const bagelsPerOption = Math.floor(totalBagels / customOptions.length);
-        const remainder = totalBagels % customOptions.length;
-
-        const bagelDistribution = customOptions.reduce((dist, option, index) => {
-            dist[option] = bagelsPerOption + (index < remainder ? 1 : 0); // Distribute remainder
-            return dist;
-        }, {});
-
-
-        const customizedItem = {
-            id: uuidv4(),
-            name: customizingItem.name.includes('Half-Dozen') ? '1/2 Dozen Bagels' : 'Dozen Bagels',
-            price: totalPrice,
-            options: bagelDistribution,
-            quantity: 1, // Add quantity
-        };
-
-        setOrderItems((prev) => [...prev, customizedItem]); // Add new item
-
-        setCustomizingItem(null);
-        setCustomOptions([]);
-    };
-
-    // --- Remove Item Function (moved from modal for clarity) ---
-    const handleRemoveItemFromOrder = (itemIdToRemove) => {
-        setOrderItems((prevOrderItems) =>
-            prevOrderItems.filter((item) => item.id !== itemIdToRemove)
+        let toppingsCost = 0;
+        const currentAvailableToppings = getAvailableToppings();
+        const selectedToppings = currentAvailableToppings.filter(t =>
+            selectedToppingIds.includes(t.id)
         );
+        selectedToppings.forEach(topping => {
+            toppingsCost += topping.additionalCost || 0;
+        });
+        const finalPrice = basePrice + toppingsCost;
+    
+        const bagelDistribution = {};
+        const expectedTotal = customizingItem.id === PRODUCTS.BAGEL_HALF.id ? 6 : 12;
+        const numSelectedToppings = selectedToppingIds.length;
+    
+        if (numSelectedToppings > 0) {
+            const baseCount = Math.floor(expectedTotal / numSelectedToppings);
+            let remainder = expectedTotal % numSelectedToppings;
+    
+            selectedToppingIds.forEach((toppingId, index) => {
+                let count = baseCount;
+
+                if (remainder > 0) {
+                    count += 1;
+                    remainder -= 1;
+                }
+
+                bagelDistribution[toppingId] = count;
+            });
+
+            const finalTotalCheck = Object.values(bagelDistribution).reduce((sum, count) => sum + count, 0);
+            if (finalTotalCheck !== expectedTotal) {
+                 console.warn("Initial bagel distribution calculation mismatch. Total:", finalTotalCheck, "Expected:", expectedTotal, bagelDistribution);
+                 if (selectedToppingIds.length > 0) {
+                     const lastToppingId = selectedToppingIds[selectedToppingIds.length - 1];
+                     bagelDistribution[lastToppingId] += (expectedTotal - finalTotalCheck);
+                     if (bagelDistribution[lastToppingId] < 0) bagelDistribution[lastToppingId] = 0;
+                 }
+            }
+        } 
+    
+        const newItem = {
+            productId: customizingItem.id,
+            lineItemId: uuidv4(),
+            name: `${customizingItem.name} (Customized)`,
+            price: finalPrice,
+            quantity: 1,
+            bagelDistribution: bagelDistribution,
+        };
+    
+        setOrderItems(prevItems => [...prevItems, newItem]);
+    
+        closeCustomization();
+    };
+    
+    const handleRemoveItemFromOrder = (removalInfo) => {
+        if (!removalInfo || !removalInfo.type || !removalInfo.id) {
+            console.error("Invalid removal info received:", removalInfo);
+            return;
+        }
+    
+        setOrderItems((prevOrderItems) => {
+            if (removalInfo.type === 'lineItem') {
+                console.log(`Removing single item with lineItemId: ${removalInfo.id}`);
+                return prevOrderItems.filter((item) => item.lineItemId !== removalInfo.id);
+            } else if (removalInfo.type === 'product') {
+                console.log(`Removing all items with productId: ${removalInfo.id}`);
+                return prevOrderItems.filter((item) => item.productId !== removalInfo.id);
+            } else {
+                console.error("Unknown removal type:", removalInfo.type);
+                return prevOrderItems;
+            }
+        });
     };
 
     return (
         <div>
-            <Navbar>
-                
-            </Navbar>
+            <Navbar
+                cartItemCount={orderItems.length}
+                className={isModalOpen ? 'navbar-modal-open' : ''}
+                isScrolled={isScrolled} 
+                onCartIconClick={toggleCartDropdown} 
+            />
+
+            <CartDropdown
+                isOpen={isCartDropdownOpen}
+                orderItems={orderItems}
+                bagelToppings={BAGEL_TOPPINGS}
+                onClose={closeCartDropdown} 
+                onGoToCheckout={handleGoToCheckout}                 
+                isScrolled={isScrolled} 
+            />
 
             <section className="home" id="home">
-                {/* ... (Home section JSX) ... */}
                  <div className="homeSpacer"></div>
                  <div className="heroContainer">
                      <div className="heroTitle">
@@ -142,119 +258,91 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal }) => {
                  </div>
                  <div className="heroText" id="homeBottomText">
                      <p>Explore my menu and order to experience the taste of Sourdough goodness!</p>
-                     <FaArrowDown id="arrowDownIcon" />
+                     <a href="#menu" style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <FaArrowDown id="arrowDownIcon" />
+                     </a>
                  </div>
             </section>
 
+            {/* --- Menu Section --- */}
             <section className="menu" id="menu">
                  <div className="menu-header">
                      <h2>In the Oven:</h2>
-                     {/* Button now opens the Order Modal */}
                      <button className="order-button" onClick={toggleModal}>Order Now</button>
                  </div>
-                 {/* ... (Menu item divs) ... */}
+                 {/* Bagels */}
                  <div className="menu-item">
                      <img src={bagels} alt="Bagels" className="menu-image" />
                      <div className="menu-text">
                          <h2>BAGELS</h2>
-                         <p>Plain: $12 / half-dozen | $22 / dozen</p>
-                         <p>Toppings (+$2 each):</p> {/* Simplified */}
+                         <p>{PRODUCTS.BAGEL_HALF.name}: ${PRODUCTS.BAGEL_HALF.price}</p>
+                         <p>{PRODUCTS.BAGEL_FULL.name}: ${PRODUCTS.BAGEL_FULL.price}</p>
+                         <p>Toppings (+${BAGEL_TOPPINGS.CHEDDAR.additionalCost} each, except Plain):</p>
                          <ul>
-                             <li>Cheddar</li>
-                             <li>Asiago</li>
-                             <li>Sesame</li>
-                             <li>Everything</li>
-                             <li>Cheddar Jalape&ntilde;o</li>
+                            {getAvailableToppings().map(t => <li key={t.id}>{t.name}</li>)}
                          </ul>
                      </div>
                  </div>
+                 {/* Loafs */}
                  <div className="menu-item">
                      <img src={loafs} alt="Loafs" className="menu-image" />
                      <div className="menu-text">
                          <h2>LOAFS</h2>
-                         <p>Regular: $12 (2 for $20)</p>
-                         <p>Inclusions: $14 </p>
+                         <p>{PRODUCTS.LOAF_REG.name}: ${PRODUCTS.LOAF_REG.price} (2 for $20 - discount applied at checkout)</p>
+                         <p>Inclusions: ${PRODUCTS.LOAF_PEP_MOZZ.price}</p>
                          <ul>
-                             <li>Pepperoni Mozzarella</li>
-                             <li>Cheddar Jalape&ntilde;o</li>
-                             <li>Cinnamon Apple</li>
-                             <li>Everything</li>
+                             <li>{PRODUCTS.LOAF_PEP_MOZZ.name}</li>
+                             <li>{PRODUCTS.LOAF_CHED_JAL.name}</li>
+                             <li>{PRODUCTS.LOAF_CIN_APP.name}</li>
+                             <li>{PRODUCTS.LOAF_EVERY.name}</li>
                          </ul>
                      </div>
                  </div>
+                 {/* Cookies */}
                  <div className="menu-item">
                      <img src={cookies} alt="Cookies" className="menu-image" />
                      <div className="menu-text">
                          <h2>COOKIES</h2>
-                         <p>$20 / dozen</p>
-                         <ul>
-                             <li>Chocolate Chip</li>
-                         </ul>
+                         <p>{PRODUCTS.COOKIE_CHOC_CHIP.name}: ${PRODUCTS.COOKIE_CHOC_CHIP.price}</p>
+                         {/* Add more cookie types if needed */}
                      </div>
                  </div>
             </section>
 
+            {/* --- Order Modal --- */}
             <OrderModal
                 isOpen={isModalOpen}
-                onClose={toggleModal} // Pass the function to close
+                onClose={toggleModal}
                 orderItems={orderItems}
                 calculateTotal={calculateTotal}
-                onAddLoaf={addLoafToOrder} // Pass the add functions
+                onAddLoaf={addLoafToOrder}
                 onAddCookies={addCookiesToOrder}
-                onCustomizeBagels={setCustomizingItem} // Pass the function to open customization
-                onRemoveItem={handleRemoveItemFromOrder} // Pass the remove function
-                onCheckout={() => { // Combine actions for checkout button
+                onCustomizeBagels={startBagelCustomization}
+                onRemoveItem={handleRemoveItemFromOrder}
+                onCheckout={() => {
                     toggleModal();
                     navigate('/checkout');
-            }}
-        />
-
-            {/* === Customization Modal === */}
-            {/* Consider extracting CustomizationModal to its own component */}
-            {customizingItem && (
-                <div className="customization-modal"> {/* Add overlay click to close? */}
-                    <div className="customization-content">
-                        <h2>Customize Your {customizingItem.name}</h2>
-                        <p>
-                            Select up to {customizingItem.name.includes('Half-Dozen') ? 2 : 4} toppings.
-                            (+$2 for each topping that isn't Plain)
-                        </p>
-                        <ul className="customization-options">
-                            {customizingItem.options.map((option, index) => (
-                                <li key={index}>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            value={option}
-                                            onChange={(e) => handleOptionChange(e, option)}
-                                            checked={customOptions.includes(option)} // Controlled component
-                                        />
-                                        {option}
-                                    </label>
-                                </li>
-                            ))}
-                        </ul>
-                        <button
-                            className='bagel-cancel-button'
-                            onClick={() => {
-                                setCustomizingItem(null);
-                                setCustomOptions([]); // Reset options on cancel
-                            }}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            className='bagel-add-button'
-                            onClick={confirmCustomization}
-                            disabled={customOptions.length === 0} // Disable if no options selected
-                        >
-                            Add to Order
-                        </button>
-                    </div>
-                </div>
-            )}
+                }}
+                products={PRODUCTS}
+                bagelToppings={BAGEL_TOPPINGS}
+                onUpdateQuantity={onUpdateQuantity}
+                onUpdateBagelDistribution={onUpdateBagelDistribution}
+            />
+            {/* --- Customization Modal --- */}
+            <CustomizationModal
+                isOpen={!!customizingItem}
+                onClose={closeCustomization}
+                itemToCustomize={customizingItem}
+                selectedToppingIds={selectedToppingIds}
+                onToppingChange={handleToppingChange}
+                onConfirm={handleConfirmCustomization}
+                availableToppings={getAvailableToppings()}
+                maxToppings={customizingItem?.id === PRODUCTS.BAGEL_HALF.id ? 2 : 4}
+                additionalCostPerTopping={BAGEL_TOPPINGS.CHEDDAR.additionalCost} 
+            />
         </div>
     );
 };
 
 export default HomePage;
+

@@ -1,0 +1,70 @@
+.customization-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.651);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.modalCloseIcon:hover {
+    color: #ff9800;
+}
+
+.customization-content {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    text-align: center;
+}
+
+.customization-option {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.customization-option li {
+    margin-bottom: 10px;
+}
+
+.customization-option label {
+    font-size: 1rem;
+    color: #333;
+}
+
+.bagel-cancel-button {
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #dddddd;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.bagel-add-button {
+    margin: 10px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff9800;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.bagel-cancel-button:hover {
+    background-color: #ffd9c3;
+}
+
+.bagel-add-button:hover {
+    background-color: #e68900;
+}

@@ -220,12 +220,40 @@
 
 .order-item {
     display: flex;
-    flex-direction: column;
-    background-color: #f9f9f9;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
+    justify-content: space-between; /* Pushes icon to the right */
+    align-items: center;    /* Vertically centers icon */
+    padding: 10px;          /* Combined padding */
+    border-radius: 5px;     /* From first definition */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* From first definition */
+    margin-bottom: 10px;    /* From first definition */
+    background-color: #f9f9f9; /* From first definition */
+    /* border-bottom: 1px solid #eee; */ /* Choose one border style or combine */
+}
+
+/* Ensure the icon itself doesn't have conflicting margins */
+.order-item .remove-item-icon {
+  cursor: pointer;
+  color: #d9534f;
+  padding: 0px;
+  /* margin-left: 0; */ /* Ensure no left margin */
+}
+.order-item .remove-item-icon:hover {
+  color: #a00;
+
+}
+
+/* Keep rules for .item-info, .quantity-controls-modal etc. */
+.order-item .item-info {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.order-item .quantity-controls-modal {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0 10px;
+    flex-shrink: 0;
 }
 
 .item-details {
@@ -240,6 +268,91 @@
     align-items: center;
 }
 
+.topping-line {
+    display: flex;          /* Arrange items horizontally */
+    justify-content: space-between; /* Space out details and controls */
+    align-items: center;    /* Vertically align items */
+    padding: 4px 0;         /* Add some vertical spacing */
+    margin-left: 15px;      /* Indent topping lines slightly */
+    font-size: 0.9em;       /* Slightly smaller font for toppings */
+  }
+  
+  /* Container for the topping name and count */
+  .topping-details {
+    flex-grow: 1;           /* Allow details to take up available space */
+    margin-right: 10px;     /* Add space before the controls */
+  }
+  
+  /* Container for the +/- buttons */
+  .topping-controls {
+    display: flex;          /* Arrange buttons horizontally */
+    align-items: center;    /* Align buttons vertically */
+    gap: 5px;               /* Add space between the buttons */
+  }
+  
+  /* Style for the individual +/- buttons */
+  .topping-controls button {
+    background-color: #eee; /* Light grey background */
+    border: 1px solid #ccc;
+    border-radius: 4px;     /* Slightly rounded corners */
+    padding: 2px 6px;       /* Small padding */
+    cursor: pointer;
+    font-size: 0.8em;       /* Smaller font size for buttons */
+    line-height: 1;         /* Ensure icon fits well */
+    transition: background-color 0.2s ease; /* Smooth hover effect */
+  }
+  
+  .topping-controls button:hover:not(:disabled) {
+    background-color: #ddd; /* Darker grey on hover */
+  }
+  
+  .topping-controls button:disabled {
+    opacity: 0.5;           /* Make disabled buttons look faded */
+    cursor: not-allowed;
+  }
+  
+  /* Style for the error message related to toppings */
+  .topping-error {
+    color: #d9534f; /* Red color for errors */
+    font-size: 0.8em;
+    margin-top: 2px;
+    list-style: none; /* Remove bullet point if needed */
+  }
+  
+  /* Optional: Adjust spacing if needed */
+  .bagel-options-summary-modal {
+    margin-top: 5px;
+    padding-left: 0; /* Remove default list padding */
+  }
+
+/* Optional: Ensure quantity span has some width */
+.order-item .quantity-controls-modal span {
+    min-width: 15px;
+    text-align: center;
+}
+  
+  .order-item .quantity-controls-modal button {
+      /* You might want similar button styling as topping controls */
+      background-color: #eee;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 2px 6px;
+      cursor: pointer;
+      font-size: 0.8em;
+      line-height: 1;
+  }
+  .order-item .quantity-controls-modal button:hover:not(:disabled) {
+      background-color: #ddd;
+  }
+  .order-item .quantity-controls-modal button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+  }
+  
+  .order-item .quantity-controls-modal span {
+      min-width: 15px; /* Give quantity number some space */
+      text-align: center;
+  }
 
 .quantity-controls {
     display: flex;
@@ -268,7 +381,6 @@
     background-color: #ccc;
     cursor: not-allowed;
 }
-
 
 .customize-icon {
     color: #007bff;

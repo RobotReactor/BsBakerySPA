@@ -1,0 +1,121 @@
+/* Styles for the cart dropdown */
+
+.cart-dropdown-overlay {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: 1050; 
+}
+  
+  .cart-dropdown {
+    position: absolute;
+    top: 95px;
+    right: 2rem;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    z-index: 1051;
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    transition: top 0.4s ease-in-out; 
+  }
+  
+  .cart-dropdown.not-scrolled {
+    top: 150px; 
+    right: 120px;
+  }
+  
+  .cart-dropdown-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0; 
+    flex-grow: 1; 
+  }
+  
+  .cart-dropdown-item {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping if needed */
+    justify-content: space-between;
+    align-items: flex-start; /* Align items to top */
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee; /* Lighter separator */
+    font-size: 0.9rem;
+  }
+  
+  .cart-dropdown-item:last-child {
+    border-bottom: none;
+  }
+  
+  .cart-dropdown-item .item-name {
+    font-weight: 500;
+    flex-basis: 60%; /* Give name more space */
+    margin-right: 10px;
+  }
+  
+  .cart-dropdown-item .item-quantity {
+    color: #555;
+    white-space: nowrap; /* Prevent quantity from wrapping */
+  }
+  
+  .cart-dropdown-item .item-toppings-summary {
+      flex-basis: 100%; /* Take full width on new line */
+      font-size: 0.8em;
+      color: #777;
+      margin-top: 3px;
+      padding-left: 5px;
+  }
+  
+  .cart-dropdown-empty {
+    text-align: center;
+    color: #777;
+    padding: 20px 0;
+    flex-grow: 1; /* Center vertically if empty */
+  }
+  
+  .cart-dropdown-checkout-btn {
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%; /* Make button full width */
+    margin-top: auto; /* Push to bottom */
+  }
+  
+  .cart-dropdown-checkout-btn:hover:not(:disabled) {
+    background-color: #e68900;
+  }
+  
+  .cart-dropdown-checkout-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Optional: Scrollbar styling */
+  .cart-dropdown::-webkit-scrollbar {
+    width: 6px;
+  }
+  .cart-dropdown::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  .cart-dropdown::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+  .cart-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+  }
+  

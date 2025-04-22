@@ -434,7 +434,7 @@
 
 /* Renamed to avoid conflict with global .checkoutButton if it exists */
 .modalCheckoutButton {
-    background-color: #4CAF50; /* Green for checkout */
+    background-color: #ff9800;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -445,84 +445,5 @@
 }
 
 .modalCheckoutButton:hover {
-    background-color: #45a049;
-}
-
-/* === Customization Modal Styles === */
-.customizationModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.651);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 20; /* Higher than order modal */
-}
-
-.customizationContent {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    width: 400px;
-    text-align: center;
-}
-
-.customizationOptions {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-    text-align: left; /* Align checkboxes/labels */
-}
-
-.customizationOptions li {
-    margin-bottom: 10px;
-}
-
-.customizationOptions label {
-    font-size: 1rem;
-    color: #333;
-    cursor: pointer; /* Make label clickable */
-    display: inline-flex; /* Align checkbox and text */
-    align-items: center;
-    gap: 8px; /* Space between checkbox and text */
-}
-
-.bagelCancelButton {
-    margin: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #dddddd;
-    color: rgb(0, 0, 0);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.bagelAddButton {
-    margin: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #ff9800;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.bagelCancelButton:hover {
-    background-color: #ffd9c3;
-}
-
-.bagelAddButton:hover:not(:disabled) { /* Add :not(:disabled) */
     background-color: #e68900;
 }
-
-.bagelAddButton:disabled { /* Style for disabled state */
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-

@@ -1,6 +1,7 @@
-// src/App.jsx
 import React, { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { PRODUCTS, getAvailableToppings } from './data/products';
+import { v4 as uuidv4 } from 'uuid';
 import './styles/App.css';
 
 // Import Pages
@@ -10,36 +11,99 @@ import Payment from './pages/Payment';
 import LoginPage from './pages/LoginPage';
 import UserPage from './pages/UserPage';
 
-// Import Hooks (if needed globally, otherwise manage in HomePage/Context)
-// import { useAuth } from "./hooks/useAuth";
-
 const App = () => {
     const [orderItems, setOrderItems] = useState([]);
-    // const { user } = useAuth(); // Auth context likely better handled via Provider
 
-    // Calculate total function (can be passed down or recalculated in components)
+    const handleRemoveItem = (lineItemIdToRemove) => {
+        console.log("App: Removing item", lineItemIdToRemove); // Add log for debugging
+        setOrderItems(prevItems => prevItems.filter(item => item.lineItemId !== lineItemIdToRemove));
+    };
+
     const calculateTotal = () => {
-        return orderItems.reduce((sum, item) => {
-            const price = Number(item.price) || 0;
-            const quantity = Number(item.quantity) || 1;
-            return sum + price * quantity;
-        }, 0);
+         return orderItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    };
+
+    const addCookiesToOrder = (product) => {
+        if (!product || !product.id) {
+           console.error("Invalid product passed to addCookiesToOrder:", product);
+           return;
+       }
+       const existingItemIndex = orderItems.findIndex(item => item.productId === product.id && !item.toppings);
+
+       if (existingItemIndex > -1) {
+           setOrderItems(prevItems => prevItems.map((item, index) =>
+               index === existingItemIndex ? { ...item, quantity: item.quantity + 1 } : item
+           ));
+       } else {
+           const cookieItem = {
+               lineItemId: uuidv4(),
+               productId: product.id,
+               name: product.name,
+               price: product.price,
+               quantity: 1
+           };
+           setOrderItems((prev) => [...prev, cookieItem]);
+       }
+   };
+
+     const addLoafToOrder = (product) => {
+         if (!product || !product.id) {
+            console.error("Invalid product passed to addLoafToOrder:", product);
+            return;
+        }
+         const existingItemIndex = orderItems.findIndex(item => item.productId === product.id && !item.toppings);
+         if (existingItemIndex > -1) {
+             setOrderItems(prevItems => prevItems.map((item, index) =>
+                 index === existingItemIndex ? { ...item, quantity: item.quantity + 1 } : item
+             ));
+         } else {
+             const loafItem = {
+                 lineItemId: uuidv4(),
+                 productId: product.id,
+                 name: product.name,
+                 price: product.price,
+                 quantity: 1
+             };
+             setOrderItems((prev) => [...prev, loafItem]);
+         }
+     };
+    
+     
+    const handleUpdateQuantity = (lineItemId, change) => {
+        setOrderItems(prevItems => {
+            const updatedItems = prevItems.map(item => {
+                if (item.lineItemId === lineItemId) {
+                    const newQuantity = (Number(item.quantity) || 0) + change;
+
+                    return { ...item, quantity: Math.max(0, newQuantity) };
+                }
+                return item; 
+            });
+
+            return updatedItems.filter(item => item.quantity > 0);
+        });
+    };
+
+    const handleUpdateBagelDistribution = (lineItemId, toppingId, change) => {
+        setOrderItems(prevItems => {
+            return prevItems.map(item => {
+                if (item.lineItemId === lineItemId && item.productId?.startsWith('B')) {
+                    const updatedDistribution = { ...(item.bagelDistribution || {}) };
+                    const currentCount = Number(updatedDistribution[toppingId]) || 0;
+                    const newCount = currentCount + change;
+
+                    if (newCount < 0) return item;
+
+                    updatedDistribution[toppingId] = newCount;
+                    return { ...item, bagelDistribution: updatedDistribution };
+                }
+                return item;
+            });
+        });
     };
 
     const clearOrder = () => {
         setOrderItems([]);
-    };
-
-    const handleBackToMenu = () => {
-        if (isModalOpen) toggleModal();
-        navigate('/');
-        setTimeout(() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' }), 0);
-    };
-
-    const handleBackToHome = () => {
-        if (isModalOpen) toggleModal();
-        navigate('/');
-        setTimeout(() => document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' }), 0);
     };
 
     return (
@@ -48,10 +112,17 @@ const App = () => {
                 path="/"
                 element={
                     <HomePage
-                        orderItems={orderItems}
-                        setOrderItems={setOrderItems}
-                        calculateTotal={calculateTotal}
-                    />
+                            orderItems={orderItems}
+                            calculateTotal={calculateTotal}
+                            onRemoveItem={handleRemoveItem}
+                            addCookiesToOrder={addCookiesToOrder}
+                            addLoafToOrder={addLoafToOrder}
+                            products={PRODUCTS}
+                            availableToppings={getAvailableToppings()}
+                            setOrderItems={setOrderItems}
+                            onUpdateQuantity={handleUpdateQuantity}
+                            onUpdateBagelDistribution={handleUpdateBagelDistribution}
+                        />
                 }
             />
             <Route
@@ -59,9 +130,9 @@ const App = () => {
                 element={
                     <Checkout
                         orderItems={orderItems}
-                        setOrderItems={setOrderItems}
+                        onRemoveItem={handleRemoveItem}
                         calculateTotal={calculateTotal}
-                        handleBackToMenu={handleBackToMenu}
+                        setOrderItems={setOrderItems}
                     />
                 }
             />
@@ -72,8 +143,6 @@ const App = () => {
                         orderItems={orderItems} 
                         total={calculateTotal()}
                         clearOrder={clearOrder}
-                        handleBackToHome={handleBackToHome}
-
                     />
                 }
             />
@@ -81,7 +150,7 @@ const App = () => {
             <Route path="/login" element={<LoginPage />} />
             {/* <Route path="*" element={<NotFoundPage />} /> */}
         </Routes>
-    )
+    );
 }
 
 export default App;

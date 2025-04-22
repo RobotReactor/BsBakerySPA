@@ -1,52 +1,50 @@
 // src/pages/Payment.jsx
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 
-// Remove discount from props if it's always coming from location state
-// Or keep it as a fallback: const Payment = ({ clearOrder, discount: propDiscount = 0 }) => {
+import '../styles/Payment.css';
+
 const Payment = ({ clearOrder }) => {
     const navigate = useNavigate();
-    const location = useLocation(); // Get location object
+    const location = useLocation(); 
 
-    // Access the state passed from Checkout
-    // Provide default values in case state is missing (e.g., direct navigation)
     const orderDetails = location.state || { orderItems: [], total: 0, discount: 0 };
-    const { orderItems, total, discount } = orderDetails; // Destructure the values
+    const { orderItems, total, discount } = orderDetails;
 
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [receiptDetails, setReceiptDetails] = useState(null);
 
-    // Now 'total' is the totalAfterDiscount, and 'discount' is the discount amount
-    const finalTotal = total; // The 'total' from state already includes the discount calculation
-    const subtotal = total + discount; // Recalculate subtotal if needed for display
+ 
+    const finalTotal = total; 
+    const subtotal = total + discount; 
+
+    const handleBackToHome = () => {
+        if (isModalOpen) toggleModal();
+        navigate('/');
+        setTimeout(() => document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' }), 0);
+    };
 
     const handlePaymentSuccess = () => {
-        // --- Simulate Payment Processing ---
         console.log('Processing payment...');
 
-        // --- Generate Receipt Details ---
         const generatedReceipt = {
             id: `BSR-${Date.now()}`,
             date: new Date().toLocaleString(),
-            items: orderItems.map(item => ({ // Use orderItems from location state
+            items: orderItems.map(item => ({ 
                 name: item.name,
                 quantity: item.quantity,
                 price: item.price,
                 options: item.options ? { ...item.options } : undefined
             })),
-            subtotal: subtotal, // Use recalculated subtotal
-            discountApplied: discount, // Use discount from location state
-            total: finalTotal // Use finalTotal (which is 'total' from location state)
+            subtotal: subtotal, 
+            discountApplied: discount,
+            total: finalTotal 
         };
         setReceiptDetails(generatedReceipt);
         setShowConfirmationModal(true);
         clearOrder();
         console.log('Payment successful! Order cleared.');
     };
-
-    // ... (handleCancelPayment, handleCloseConfirmation, handleSaveReceipt remain similar,
-    //      just ensure they use the correct variables like 'subtotal', 'discount', 'finalTotal'
-    //      when generating the receipt text)
 
     const handleSaveReceipt = () => {
         if (!receiptDetails) return;
@@ -61,14 +59,13 @@ const Payment = ({ clearOrder }) => {
                 receiptText += `  Options: ${Object.entries(item.options).map(([opt, count]) => `${count} ${opt}`).join(', ')}\n`;
             }
         });
-        receiptText += `\nSubtotal: $${receiptDetails.subtotal.toFixed(2)}\n`; // Use subtotal from receipt
+        receiptText += `\nSubtotal: $${receiptDetails.subtotal.toFixed(2)}\n`;
         if (receiptDetails.discountApplied > 0) {
-            receiptText += `Discount: -$${receiptDetails.discountApplied.toFixed(2)}\n`; // Use discount from receipt
+            receiptText += `Discount: -$${receiptDetails.discountApplied.toFixed(2)}\n`; 
         }
-        receiptText += `Total: $${receiptDetails.total.toFixed(2)}\n`; // Use total from receipt
+        receiptText += `Total: $${receiptDetails.total.toFixed(2)}\n`;
         receiptText += `Thank you for your order!`;
 
-        // ... (Blob creation and download logic) ...
 
         console.log("Receipt saved.");
     };
@@ -93,7 +90,6 @@ const Payment = ({ clearOrder }) => {
                 {/* Display Final Total */}
                 <h3>Total Amount: ${finalTotal.toFixed(2)}</h3>
 
-                {/* ... (Rest of Payment JSX, including actions and modal) ... */}
                  <div className="payment-actions">
                     <button onClick={() => navigate('/checkout')}>Back to Cart</button>
                     <button onClick={handlePaymentSuccess} disabled={orderItems.length === 0}>
@@ -108,9 +104,9 @@ const Payment = ({ clearOrder }) => {
                     <div className="payment-modal-content">
                         <h2>Payment Successful!</h2>
                         <p>Your Order ID: {receiptDetails.id}</p>
-                        <p>Total Paid: ${receiptDetails.total.toFixed(2)}</p> {/* Use total from receipt */}
+                        <p>Total Paid: ${receiptDetails.total.toFixed(2)}</p>
                         <p>Thank you for your order!</p>
-                        <button onClick={() => { setShowConfirmationModal(false); setReceiptDetails(null); navigate('/'); }}>
+                        <button onClick={() => { setShowConfirmationModal(false); setReceiptDetails(null); handleBackToHome(); }}>
                             Back to Home
                         </button>
                         <button id="save-receipt-button" onClick={handleSaveReceipt}>
