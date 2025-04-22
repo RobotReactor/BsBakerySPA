@@ -14,14 +14,12 @@ const Payment = ({ clearOrder }) => {
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [receiptDetails, setReceiptDetails] = useState(null);
 
- 
     const finalTotal = total; 
     const subtotal = total + discount; 
 
     const handleBackToHome = () => {
-        if (isModalOpen) toggleModal();
         navigate('/');
-        setTimeout(() => document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' }), 0);
+        setTimeout(() => document.getElementById('home'), 0);
     };
 
     const handlePaymentSuccess = () => {
