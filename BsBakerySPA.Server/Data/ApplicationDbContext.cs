@@ -85,6 +85,30 @@ namespace BsBakerySPA.Server.Data
                 // entity.Property(bt => bt.Price).HasColumnType("decimal(18,2)");
             });
 
+            modelBuilder.Entity<BagelTopping>().HasData(
+                new BagelTopping { Id = "T000", Name = "Plain", Price = 0m  }, 
+                new BagelTopping { Id = "T001", Name = "Cheddar", Price = 1.00m }, 
+                new BagelTopping { Id = "T002", Name = "Asiago", Price = 1.00m },
+                new BagelTopping { Id = "T003", Name = "Sesame", Price = 1.00m },
+                new BagelTopping { Id = "T004", Name = "Everything", Price = 1.00m },
+                new BagelTopping { Id = "T005", Name = "Cheddar Jalapeño", Price = 1.00m }
+            );
+
+            // Seed Products
+            modelBuilder.Entity<Product>().HasData(
+                // Loafs
+                new Product { Id = "L001", Name = "Regular", Category = "Loaf", Price = 12.00m },
+                new Product { Id = "L002", Name = "Pepperoni Mozzarella", Category = "Loaf", Price = 14.00m },
+                new Product { Id = "L003", Name = "Cheddar Jalapeño", Category = "Loaf", Price = 14.00m },
+                new Product { Id = "L004", Name = "Cinnamon Apple", Category = "Loaf", Price = 14.00m },
+                new Product { Id = "L005", Name = "Everything Loaf", Category = "Loaf", Price = 14.00m },
+                // Bagels
+                new Product { Id = "B001", Name = "1/2 Dozen Bagels", Category = "Bagel", Price = 12.00m }, // Updated Price
+                new Product { Id = "B002", Name = "Dozen Bagels", Category = "Bagel", Price = 22.00m }, // Updated Price
+                // Cookies
+                new Product { Id = "C001", Name = "Chocolate Chip Cookies (Dozen)", Category = "Cookie", Price = 20.00m } // Updated ID and Price
+            );
+
             // --- End New Configurations ---
 
             // Add more configurations for other entities as needed

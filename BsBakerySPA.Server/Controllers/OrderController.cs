@@ -1,8 +1,8 @@
 // BsBakerySPA.Server/Controllers/OrderController.cs
-using Microsoft.AspNetCore.Mvc;
 using BsBakerySPA.Server.Models;
 using BsBakerySPA.Server.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging; // Added for logging
@@ -19,14 +19,29 @@ namespace BsBakerySPA.Server.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<OrderController> _logger; // Inject Logger
 
+        // --- Define Admin UIDs (Should match frontend/config) ---
+        // CRITICAL: Replace with actual admin Firebase UIDs if not done already
+        private static readonly List<string> AdminUserIds = new List<string> {
+            "XKE46g6IuBNZSYDyfbPLDMILfwq1", // Example UID
+            "lujtPx1DerXyqicnWXwOiJI3JSK2"  // Example UID
+        };
+        // ---
+
         public OrderController(ApplicationDbContext context, ILogger<OrderController> logger) // Updated constructor
         {
             _context = context;
             _logger = logger; // Assign logger
         }
 
+        // Helper to check if the current user is an admin
+        private bool IsAdminUser()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return !string.IsNullOrEmpty(userId) && AdminUserIds.Contains(userId);
+            // TODO: Replace with claim check: return User.HasClaim("admin", "true");
+        }
+
         // --- DTOs for creating an order ---
-        // Renamed OrderCreateDto for clarity
         public class CreateOrderRequestDto
         {
             [Required]
@@ -57,85 +72,111 @@ namespace BsBakerySPA.Server.Controllers
             var firebaseUid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(firebaseUid))
             {
-                // This check is good practice, though [Authorize] should prevent anonymous access
                 _logger.LogWarning("CreateOrder called without valid Firebase UID in token.");
                 return Unauthorized("User ID not found in token.");
             }
 
             _logger.LogInformation("Attempting to create order for user {FirebaseUid}", firebaseUid);
 
-            // --- Server-Side Validation & Calculation ---
+            // --- Fetch ALL potentially needed data upfront ---
             var productIds = orderDto.Items.Select(i => i.ProductId).Distinct().ToList();
-
-            // 1. Fetch products from DB to get current prices and validate IDs
             var productsFromDb = await _context.Products
                                                .Where(p => productIds.Contains(p.Id))
-                                               .AsNoTracking() // Read-only query
-                                               .ToDictionaryAsync(p => p.Id); // Use Dictionary for efficient lookup
+                                               .AsNoTracking()
+                                               .ToDictionaryAsync(p => p.Id);
 
-            decimal calculatedSubtotal = 0m;
+            // Get all possible topping IDs mentioned in the order
+            var allToppingIds = orderDto.Items
+                                        .Where(i => i.SelectedToppingIds != null)
+                                        .SelectMany(i => i.SelectedToppingIds!) // Use null-forgiving operator
+                                        .Distinct()
+                                        .ToList();
+
+            // Fetch relevant toppings from DB
+            var toppingsFromDb = await _context.BagelToppings
+                                               .Where(t => allToppingIds.Contains(t.Id))
+                                               .AsNoTracking()
+                                               .ToDictionaryAsync(t => t.Id);
+            // --- End data fetching ---
+
+
+            decimal calculatedSubtotal = 0m; // This will be the final total for the order line items
             var orderItems = new List<OrderItem>();
 
             foreach (var itemDto in orderDto.Items)
             {
-                // 2. Validate Product ID and get price
                 if (!productsFromDb.TryGetValue(itemDto.ProductId, out var product))
                 {
                     _logger.LogWarning("CreateOrder: Invalid ProductId {ProductId} received for user {FirebaseUid}.", itemDto.ProductId, firebaseUid);
                     return BadRequest($"Product with ID '{itemDto.ProductId}' not found or unavailable.");
                 }
 
-                // TODO: Add validation for BagelDistribution counts if needed (e.g., ensure sum matches expected quantity)
+                // --- Calculate Topping Cost for this item ---
+                decimal currentItemToppingCost = 0m;
+                // Use SelectedToppingIds if available (for bagels)
+                if (itemDto.SelectedToppingIds != null && itemDto.SelectedToppingIds.Any())
+                {
+                    foreach (var toppingId in itemDto.SelectedToppingIds)
+                    {
+                        if (toppingsFromDb.TryGetValue(toppingId, out var topping))
+                        {
+                            currentItemToppingCost += topping.Price;
+                        }
+                        else
+                        {
+                            _logger.LogWarning("CreateOrder: Invalid ToppingId {ToppingId} for Product {ProductId} received for user {FirebaseUid}.", toppingId, itemDto.ProductId, firebaseUid);
+                            // Return BadRequest if an invalid topping ID is critical
+                            // return BadRequest($"Invalid topping ID '{toppingId}' found.");
+                        }
+                    }
+                }
+                // --- End Topping Cost Calculation ---
 
-                // 3. Create OrderItem entity
+                // --- Calculate final price for THIS item ---
+                decimal finalItemPrice = product.Price + currentItemToppingCost;
+                // ---
+
                 var orderItem = new OrderItem
                 {
                     ProductId = itemDto.ProductId,
                     Quantity = itemDto.Quantity,
-                    PricePerItem = product.Price, // Use price from DB
-                    // Serialize customization data to JSON strings for storage
+                    PricePerItem = finalItemPrice, // <-- Use the final calculated price
                     SelectedToppingIdsJson = itemDto.SelectedToppingIds != null && itemDto.SelectedToppingIds.Any()
                                                 ? JsonSerializer.Serialize(itemDto.SelectedToppingIds)
                                                 : null,
                     BagelDistributionJson = itemDto.BagelDistribution != null && itemDto.BagelDistribution.Any()
                                                 ? JsonSerializer.Serialize(itemDto.BagelDistribution)
                                                 : null
-                    // OrderId will be set by EF Core relationship
                 };
                 orderItems.Add(orderItem);
 
-                // 4. Calculate subtotal based on DB price
-                calculatedSubtotal += product.Price * itemDto.Quantity;
-                // TODO: Add logic here if toppings have extra costs
+                // --- Add this item's total cost to the overall subtotal ---
+                calculatedSubtotal += finalItemPrice * itemDto.Quantity;
+                // ---
             }
 
-            // 5. Calculate Discount (Server-Side)
-            decimal calculatedDiscount = CalculateDiscountFromServer(orderItems, productsFromDb); // Pass products for price info
-            decimal calculatedTotal = calculatedSubtotal - calculatedDiscount;
-            // --- End Server-Side Validation & Calculation ---
+            // Calculate Discount (Server-Side)
+            decimal calculatedDiscount = CalculateDiscountFromServer(orderItems, productsFromDb);
+            decimal calculatedTotal = calculatedSubtotal - calculatedDiscount; // Subtotal already includes toppings
 
-
-            // --- Create Order Entity ---
             var newOrder = new Order
             {
-                UserFirebaseUid = firebaseUid, // Link to the logged-in user
+                UserFirebaseUid = firebaseUid,
                 OrderTimestamp = DateTime.UtcNow,
-                Status = "Placed", // Initial status
-                OrderItems = orderItems, // Assign the validated items
-                TotalAmount = calculatedTotal, // Use server-calculated total
-                DiscountApplied = calculatedDiscount // Use server-calculated discount
+                Status = "Placed",
+                OrderItems = orderItems,
+                TotalAmount = calculatedTotal, // Use final total
+                DiscountApplied = calculatedDiscount
             };
 
-            // --- Save to Database ---
             try
             {
                 _context.Orders.Add(newOrder);
-                await _context.SaveChangesAsync(); // Save order and its items automatically due to relationship
+                await _context.SaveChangesAsync();
                 _logger.LogInformation("Successfully created Order {OrderId} for user {FirebaseUid}", newOrder.OrderId, firebaseUid);
 
-                // Return 201 Created with the location/details of the new order
-                // Consider creating an OrderResponseDto to return specific fields
-                return CreatedAtRoute("GetOrderById", new { id = newOrder.OrderId }, newOrder); // Use route name
+                // Return DTO recommended here instead of the full newOrder object
+                return CreatedAtRoute("GetOrderById", new { id = newOrder.OrderId }, newOrder);
             }
             catch (DbUpdateException dbEx)
             {
@@ -151,7 +192,7 @@ namespace BsBakerySPA.Server.Controllers
 
 
         // GET /api/order/my (Get orders for the logged-in user)
-        [HttpGet("my", Name = "GetMyOrders")] // Added Name for potential CreatedAtRoute usage elsewhere
+        [HttpGet("my", Name = "GetMyOrders")]
         public async Task<IActionResult> GetMyOrders()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -172,7 +213,7 @@ namespace BsBakerySPA.Server.Controllers
         }
 
         // GET /api/order/{id} (Get a specific order by ID)
-        [HttpGet("{id:int}", Name = "GetOrderById")] // Added :int constraint and Name
+        [HttpGet("{id:int}", Name = "GetOrderById")]
         public async Task<IActionResult> GetOrderById(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -188,6 +229,9 @@ namespace BsBakerySPA.Server.Controllers
 
             if (order == null)
             {
+                // Allow admin to fetch any order by ID if needed, otherwise keep user check
+                // if (!IsAdminUser()) return NotFound();
+                // order = await _context.Orders... // Fetch without user check if admin
                 _logger.LogWarning("User {FirebaseUid} attempted to access non-existent or unauthorized Order {OrderId}", userId, id);
                 return NotFound();
             }
@@ -197,42 +241,126 @@ namespace BsBakerySPA.Server.Controllers
         }
 
 
-        // --- Server-Side Discount Calculation Helper ---
+        // --- NEW: GET /api/order/all (Admin Only) ---
+        [HttpGet("all", Name = "GetAllOrdersAdmin")]
+        public async Task<IActionResult> GetAllOrdersAdmin()
+        {
+            if (!IsAdminUser())
+            {
+                _logger.LogWarning("Non-admin user attempted to access GetAllOrdersAdmin.");
+                return Forbid(); // Or Unauthorized()
+            }
+
+            _logger.LogInformation("Admin user accessing all orders.");
+            var allOrders = await _context.Orders
+                                          .Include(o => o.OrderItems) // Include items
+                                          .Include(o => o.User) // Include user info (optional)
+                                          .OrderBy(o => o.OrderTimestamp) // Earliest first
+                                          .AsNoTracking()
+                                          .ToListAsync();
+
+            // Consider mapping to DTOs here as well, especially if including User info
+            return Ok(allOrders);
+        }
+
+        // --- NEW: PUT /api/order/{id}/status (Admin Only) ---
+        public class UpdateOrderStatusDto
+        {
+            [Required]
+            [MaxLength(50)]
+            public string NewStatus { get; set; } = string.Empty;
+        }
+
+        [HttpPut("{id:int}/status", Name = "UpdateOrderStatusAdmin")]
+        public async Task<IActionResult> UpdateOrderStatusAdmin(int id, [FromBody] UpdateOrderStatusDto statusDto)
+        {
+            if (!IsAdminUser())
+            {
+                _logger.LogWarning("Non-admin user attempted to update status for Order {OrderId}.", id);
+                return Forbid();
+            }
+
+            // Validate the new status if needed (e.g., ensure it's one of predefined values)
+            var validStatuses = new[] { "Placed", "Preparing", "Ready for Pickup", "Completed", "Cancelled" };
+            if (!validStatuses.Contains(statusDto.NewStatus, StringComparer.OrdinalIgnoreCase))
+            {
+                 return BadRequest($"Invalid status value: {statusDto.NewStatus}");
+            }
+
+            _logger.LogInformation("Admin user updating status for Order {OrderId} to {NewStatus}", id, statusDto.NewStatus);
+
+            var order = await _context.Orders.FindAsync(id);
+
+            if (order == null)
+            {
+                return NotFound($"Order with ID {id} not found.");
+            }
+
+            order.Status = statusDto.NewStatus; // Update the status
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Successfully updated status for Order {OrderId}", id);
+                return NoContent(); // Success, no content to return
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                 _logger.LogError(ex, "Concurrency error updating status for Order {OrderId}", id);
+                 return Conflict("The order was modified by another user. Please refresh and try again.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating status for Order {OrderId}", id);
+                return StatusCode(500, "An internal error occurred while updating the order status.");
+            }
+        }
+
+
+        // --- Discount Calculation Helper ---
         private decimal CalculateDiscountFromServer(List<OrderItem> items, Dictionary<string, Product> products)
         {
-            // Find loaf items using the Product dictionary to get category/price info
             int loafCount = 0;
-            decimal loafPrice = 0m; // Find the price of a standard loaf if needed
+            decimal regularLoafPrice = 12.00m; // Default price for L001
+
+            // Try to get the actual price of L001 if it's available in the fetched products
+            if (products.TryGetValue("L001", out var regLoafProduct))
+            {
+                regularLoafPrice = regLoafProduct.Price;
+            }
+            else
+            {
+                // Fallback if L001 wasn't ordered but other loaves were, use the first loaf price found
+                var anyLoafProduct = products.Values.FirstOrDefault(p => p.Category.Equals("Loaf", StringComparison.OrdinalIgnoreCase));
+                if (anyLoafProduct != null) regularLoafPrice = anyLoafProduct.Price;
+                // If still 0, we can't calculate discount based on L001 price
+            }
+
 
             foreach (var item in items)
             {
-                if (products.TryGetValue(item.ProductId, out var product))
+                // Check if the product exists in our fetched dictionary
+                if (products.ContainsKey(item.ProductId))
                 {
-                    if (product.Category.Equals("Loaf", StringComparison.OrdinalIgnoreCase))
+                    // Check if the product is a Loaf
+                    if (products[item.ProductId].Category.Equals("Loaf", StringComparison.OrdinalIgnoreCase))
                     {
                         loafCount += item.Quantity;
-                        // Assuming L001 is the standard loaf for discount price reference
-                        if (product.Id == "L001") loafPrice = product.Price;
                     }
                 }
             }
 
-            if (loafPrice == 0m)
-            {
-                // Attempt to get price if L001 wasn't in the order but other loaves were
-                var anyLoafProduct = products.Values.FirstOrDefault(p => p.Category.Equals("Loaf", StringComparison.OrdinalIgnoreCase));
-                if (anyLoafProduct != null) loafPrice = anyLoafProduct.Price;
-                else return 0m; // No loaf price found, cannot calculate discount
-            }
+            // If no loaves or no price reference, no discount
+            if (loafCount == 0 || regularLoafPrice == 0m) return 0m;
 
-            // Calculate discount: $4 off for every pair of loaves (original price $12 each -> $20 for 2)
-            decimal discountPerPair = (loafPrice * 2) - 20.00m;
+            // Calculate discount: $4 off for every pair of loaves (based on $12 regular price -> $20 for 2)
+            decimal discountPerPair = (regularLoafPrice * 2) - 20.00m; // e.g., ($12 * 2) - $20 = $4
             if (discountPerPair < 0) discountPerPair = 0; // Ensure discount isn't negative
 
             int pairs = loafCount / 2;
             decimal totalDiscount = pairs * discountPerPair;
 
-            _logger.LogInformation("Calculated discount: {TotalDiscount} for {LoafCount} loaves.", totalDiscount, loafCount);
+            _logger.LogInformation("Calculated discount: {TotalDiscount} for {LoafCount} loaves based on regular price {RegularLoafPrice}.", totalDiscount, loafCount, regularLoafPrice);
             return totalDiscount;
         }
     }

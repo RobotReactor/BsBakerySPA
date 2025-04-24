@@ -3,6 +3,7 @@ using System;
 using BsBakerySPA.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BsBakerySPA.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424193840_UpdateSeedDataFromProductsJsx")]
+    partial class UpdateSeedDataFromProductsJsx
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.15");
@@ -28,9 +31,6 @@ namespace BsBakerySPA.Server.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18, 2)");
-
                     b.HasKey("Id");
 
                     b.ToTable("BagelToppings");
@@ -39,38 +39,32 @@ namespace BsBakerySPA.Server.Data.Migrations
                         new
                         {
                             Id = "T000",
-                            Name = "Plain",
-                            Price = 0m
+                            Name = "Plain"
                         },
                         new
                         {
                             Id = "T001",
-                            Name = "Cheddar",
-                            Price = 1.00m
+                            Name = "Cheddar"
                         },
                         new
                         {
                             Id = "T002",
-                            Name = "Asiago",
-                            Price = 1.00m
+                            Name = "Asiago"
                         },
                         new
                         {
                             Id = "T003",
-                            Name = "Sesame",
-                            Price = 1.00m
+                            Name = "Sesame"
                         },
                         new
                         {
                             Id = "T004",
-                            Name = "Everything",
-                            Price = 1.00m
+                            Name = "Everything"
                         },
                         new
                         {
                             Id = "T005",
-                            Name = "Cheddar Jalapeño",
-                            Price = 1.00m
+                            Name = "Cheddar Jalapeño"
                         });
                 });
 

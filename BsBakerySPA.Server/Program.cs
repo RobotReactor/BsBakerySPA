@@ -2,20 +2,24 @@ using Microsoft.EntityFrameworkCore;
 using BsBakerySPA.Server.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt; // Required for JwtSecurityToken
-using Microsoft.IdentityModel.JsonWebTokens; // Required for JsonWebToken
+using System.IdentityModel.Tokens.Jwt; 
+using Microsoft.IdentityModel.JsonWebTokens; 
+using System.Text.Json.Serialization;
 
 Console.WriteLine("Application starting...");
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Database Configuration ---
-// Consider using User Secrets for connection strings in development:
-// https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                       ?? "Data Source=bsbakery.db"; // Fallback for local dev if not in config
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    });
 
-Console.WriteLine($"Using connection string: {connectionString}"); // Log the connection string being used
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                       ?? "Data Source=bsbakery.db"; 
+
+Console.WriteLine($"Using connection string: {connectionString}");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString)); // Use SQLite
