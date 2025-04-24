@@ -1,109 +1,103 @@
+// src/components/CartDropdown/CartDropdown.jsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../../styles/CartDropdown.css'; 
+import { FaTimes } from 'react-icons/fa';
+import '../../styles/CartDropdown.css'; // Make sure this path is correct
 
-const getToppingName = (id, bagelToppings) => {
-    if (bagelToppings && typeof bagelToppings === 'object') {
-        const toppingsArray = Object.values(bagelToppings);
-        const topping = toppingsArray.find(t => t && t.id === id);
-        if (topping) {
-            return topping.name;
-        }
-    }
-    console.warn(`(Dropdown) Topping name not found for ID: ${id}`);
-    return id;
-};
+// Assuming getToppingById is available or imported if needed
+// import { getToppingById } from '../../data/products';
 
-const groupOrderItemsForDropdown = (items) => {
-    const groupedNonBagels = {};
-    const individualBagels = [];
-
-    (items || []).forEach(item => {
-        if (!item) return;
-
-        if (item.productId?.startsWith('B')) {
-            individualBagels.push({
-                ...item,
-                quantity: Number(item.quantity) || 1,
-                displayKey: item.lineItemId
-            });
-        } else {
-            const groupKey = item.productId;
-            if (!groupedNonBagels[groupKey]) {
-                groupedNonBagels[groupKey] = {
-                    ...item,
-                    quantity: 0,
-                    displayKey: groupKey
-                };
-            }
-            groupedNonBagels[groupKey].quantity += (Number(item.quantity) || 1);
-        }
-    });
-    return [...individualBagels, ...Object.values(groupedNonBagels)];
-};
-
-
-const CartDropdown = ({ isOpen, orderItems, bagelToppings, onClose, onGoToCheckout, isScrolled }) => {
-
+const CartDropdown = ({
+    isOpen,
+    orderItems, // Should be cartItems from context
+    bagelToppings, // Static data or from context/props
+    onClose, // Function to close the dropdown
+    onGoToCheckout,
+    isScrolled // Keep this prop if needed for positioning adjustments
+}) => {
     if (!isOpen) {
-        return null;
+        return null; // Don't render anything if not open
     }
 
-    const displayItems = groupOrderItemsForDropdown(orderItems);
+    // Helper to get topping name
+    const getToppingName = (id) => {
+        if (bagelToppings && typeof bagelToppings === 'object') {
+            const toppingsArray = Object.values(bagelToppings);
+            const topping = toppingsArray.find(t => t && t.id === id);
+            if (topping) return topping.name;
+        }
+        return id; // Fallback
+    };
 
-    // Prevent clicks inside the dropdown from closing it immediately
-    const handleDropdownClick = (e) => {
+    // Use orderItems || [] for safety
+    const currentOrderItems = orderItems || [];
+
+    // Function to stop clicks inside the dropdown from closing it
+    const handleDropdownContentClick = (e) => {
         e.stopPropagation();
     };
 
-    const dropdownClass = `cart-dropdown ${!isScrolled ? 'not-scrolled' : ''}`;
-
     return (
-        <div className="cart-dropdown-overlay" onClick={onClose}> {/* Overlay for closing */}
-            <div className={dropdownClass.trim()} onClick={handleDropdownClick}>
-            {displayItems.length === 0 ? (
-                    <p className="cart-dropdown-empty">Your cart is empty.</p>
-                ) : (
-                    <ul className="cart-dropdown-list">
-                        {displayItems.map((item) => {
-                            const isBagel = item.productId?.startsWith('B');
+        // --- Overlay Container ---
+        // onClick on the overlay calls onClose
+        <div className={`cart-dropdown-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
+            {/* --- Dropdown Content --- */}
+            {/* Add onClick to stop propagation */}
+            <div
+                className={`cart-dropdown ${isScrolled ? 'scrolled' : ''}`}
+                onClick={handleDropdownContentClick}
+            >
+                <div className="cart-dropdown-header">
+                    <h3>Your Cart</h3>
+                    {/* Close icon still works */}
+                    <FaTimes className="close-icon" onClick={onClose} />
+                </div>
 
-                            // Generate display name (simplified for dropdown)
-                            let displayName = item.name || 'Unnamed Item';
-                            if (isBagel) {
-                                displayName = displayName.replace(/\s*\(Customized\)/i, '');
-                            }
+                {/* Scrollable Item List Container */}
+                <div className="cart-dropdown-items-list">
+                    {currentOrderItems.length === 0 ? (
+                        <p className="empty-cart-message">Your cart is empty.</p>
+                    ) : (
+                        <ul>
+                            {currentOrderItems.map((item) => {
+                                const isBagel = item.productId?.startsWith('B');
+                                let displayName = item.name || 'Unnamed Item';
+                                if (isBagel) {
+                                    displayName = displayName.replace(/\s*\(Customized\)/i, '');
+                                }
 
-                            return (
-                                <li key={item.displayKey} className="cart-dropdown-item">
-                                    <span className="item-name">{displayName}</span>
-                                    <span className="item-quantity">x {item.quantity}</span>
-                                    {/* Optionally show price */}
-                                    {/* <span className="item-price">${(item.price * item.quantity).toFixed(2)}</span> */}
-
-                                    {/* Optional: Show simple topping list for bagels */}
-                                    {isBagel && item.bagelDistribution && Object.keys(item.bagelDistribution).length > 0 && (
-                                        <div className="item-toppings-summary">
-                                            ({Object.entries(item.bagelDistribution)
-                                                .filter(([, count]) => Number(count) > 0)
-                                                .map(([toppingId]) => getToppingName(toppingId, bagelToppings))
-                                                .join(', ')})
+                                return (
+                                    <li key={item.lineItemId} className="cart-dropdown-item">
+                                        <div className="item-details-line">
+                                            <span className="item-name">{displayName}</span>
+                                            <span className="item-quantity">Qty: {item.quantity}</span>
+                                            <span className="item-price">${(Number(item.price) || 0).toFixed(2)}</span>
                                         </div>
-                                    )}
-                                </li>
-                            );
-                        })}
-                    </ul>
+                                        {isBagel && item.bagelDistribution && Object.keys(item.bagelDistribution).length > 0 && (
+                                            <div className="item-toppings-summary">
+                                                ({Object.entries(item.bagelDistribution)
+                                                    .map(([id, count]) => `${getToppingName(id)} x${count}`)
+                                                    .join(', ')})
+                                            </div>
+                                        )}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                </div>
+
+                {/* Fixed Footer/Button Area */}
+                {currentOrderItems.length > 0 && (
+                    <div className="cart-dropdown-footer">
+                        <button onClick={onGoToCheckout} className="go-to-checkout-button">
+                            Go to Checkout
+                        </button>
+                    </div>
                 )}
-                <button
-                    className="cart-dropdown-checkout-btn"
-                    onClick={onGoToCheckout}
-                    disabled={displayItems.length === 0}
-                >
-                    Go to Checkout
-                </button>
             </div>
+            {/* --- End Dropdown Content --- */}
         </div>
+        // --- End Overlay Container ---
     );
 };
 

@@ -1,17 +1,22 @@
 // src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowDown } from 'react-icons/fa'; 
-import { v4 as uuidv4 } from 'uuid';
+import { FaArrowDown } from 'react-icons/fa';
+// Removed uuidv4 import as item creation should be handled by the context now
+// import { v4 as uuidv4 } from 'uuid';
 
 import Navbar from '../components/NavBar/NavBar';
 import OrderModal from '../components/OrderModal/OrderModal';
 import CustomizationModal from '../components/CustomizationModal/CustomizationModal';
 import CartDropdown from '../components/CartDropdown/CartDropdown';
 
+// --- Import the useCart hook ---
+import { useCart } from '../hooks/useCart';
 
+// Keep product data imports if needed for display or passing to modals
 import { PRODUCTS, BAGEL_TOPPINGS, getAvailableToppings, getToppingById } from '../data/products';
 
+// Keep asset imports
 import bagels from '../assets/Bagels.jpg';
 import loafs from '../assets/Loafs.jpg';
 import cookies from '../assets/Cookies.jpg';
@@ -19,13 +24,28 @@ import baked_goods from '../assets/baked_goods.jpg';
 
 import '../styles/HomePage.css';
 
-const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity, onUpdateBagelDistribution }) => {
+// --- Remove cart-related props ---
+const HomePage = ({ products, availableToppings }) => { // Keep products/toppings props if needed for display
     const navigate = useNavigate();
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [customizingItem, setCustomizingItem] = useState(null); 
-    const [selectedToppingIds, setSelectedToppingIds] = useState([]); 
-    const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
+    // --- Get cart state and functions from the useCart hook ---
+    const {
+        cartItems,
+        addItemToCart,
+        addPrebuiltItemToCart, // Assuming this exists in your context for customized items
+        removeItemFromCart,
+        updateItemQuantity,
+        updateBagelDistribution,
+        calculateTotal
+    } = useCart();
 
+    // Local state for UI elements remains the same
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [customizingItem, setCustomizingItem] = useState(null);
+    const [selectedToppingIds, setSelectedToppingIds] = useState([]);
+    const [isCartDropdownOpen, setIsCartDropdownOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    // useEffect remains the same
     useEffect(() => {
         const handleScroll = () => {
             const scrolled = window.scrollY > 0;
@@ -60,8 +80,8 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
         };
     }, [isModalOpen, customizingItem, isCartDropdownOpen]);
 
-    const [isScrolled, setIsScrolled] = useState(false); 
 
+    // UI state functions remain the same
     const toggleModal = () => {
         const opening = !isModalOpen;
         setIsModalOpen(opening);
@@ -73,11 +93,8 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
 
     const toggleCartDropdown = () => {
         if (!isModalOpen) {
-            setIsCartDropdownOpen(prev => {
-                return !prev;
-            });
+            setIsCartDropdownOpen(prev => !prev);
         } else {
-            // Log if the modal is blocking the dropdown
             console.log('[DEBUG] OrderModal is open, preventing cart dropdown toggle.');
         }
     };
@@ -91,48 +108,31 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
         navigate('/checkout');
     };
 
+    // --- Update handlers to use context functions ---
     const addCookiesToOrder = (product) => {
-        if (!product || !product.id) {
-            console.error("Invalid product passed to addCookiesToOrder:", product);
-            return;
-        }
-        const cookieItem = {
-            lineItemId: uuidv4(),
-            productId: product.id,
-            name: product.name,
-            price: product.price,
-            quantity: 1
-        };
-        setOrderItems((prev) => [...prev, cookieItem]);
-    };
-    
-    const addLoafToOrder = (product) => {
-        if (!product || !product.id) {
-            console.error("Invalid product passed to addLoafToOrder:", product);
-            return;
-        }
-        const loafItem = {
-            lineItemId: uuidv4(),
-            productId: product.id,
-            name: product.name,
-            price: product.price,
-            quantity: 1
-        };
-        setOrderItems((prev) => [...prev, loafItem]);
+        // Use addItemToCart from context
+        addItemToCart(product, 'cookie');
     };
 
+    const addLoafToOrder = (product) => {
+        // Use addItemToCart from context
+        addItemToCart(product, 'loaf');
+    };
+
+    // This function only sets local state for the customization modal
     const startBagelCustomization = (baseBagelProduct) => {
         setCustomizingItem(baseBagelProduct);
         setSelectedToppingIds([]);
     };
 
+    // This function only resets local state
     const closeCustomization = () => {
         setCustomizingItem(null);
         setSelectedToppingIds([]);
     };
 
+    // handleToppingChange remains the same as it modifies local state for the modal
     const handleToppingChange = (e, toppingId) => {
-        // Logic remains the same...
         const maxToppings = customizingItem.id === PRODUCTS.BAGEL_HALF.id ? 2 : 4;
         const isChecked = e.target.checked;
         let nextSelectedIds;
@@ -142,7 +142,7 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
                 nextSelectedIds = [...selectedToppingIds, toppingId];
             } else {
                 alert(`You can only select up to ${maxToppings} toppings for ${customizingItem.name}.`);
-                e.target.checked = false;
+                e.target.checked = false; // Prevent checking
                 return;
             }
         } else {
@@ -151,12 +151,14 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
         setSelectedToppingIds(nextSelectedIds);
     };
 
+    // handleConfirmCustomization now uses addPrebuiltItemToCart from context
     const handleConfirmCustomization = () => {
         if (!customizingItem) return;
-    
+
+        // --- Logic to calculate price, distribution etc. remains the same ---
         const basePrice = customizingItem.price;
         let toppingsCost = 0;
-        const currentAvailableToppings = getAvailableToppings();
+        const currentAvailableToppings = getAvailableToppings(); // Use prop if passed, otherwise import
         const selectedToppings = currentAvailableToppings.filter(t =>
             selectedToppingIds.includes(t.id)
         );
@@ -164,89 +166,101 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
             toppingsCost += topping.additionalCost || 0;
         });
         const finalPrice = basePrice + toppingsCost;
-    
+
         const bagelDistribution = {};
         const expectedTotal = customizingItem.id === PRODUCTS.BAGEL_HALF.id ? 6 : 12;
         const numSelectedToppings = selectedToppingIds.length;
-    
+
         if (numSelectedToppings > 0) {
             const baseCount = Math.floor(expectedTotal / numSelectedToppings);
             let remainder = expectedTotal % numSelectedToppings;
-    
-            selectedToppingIds.forEach((toppingId, index) => {
-                let count = baseCount;
 
+            selectedToppingIds.forEach((toppingId) => {
+                let count = baseCount;
                 if (remainder > 0) {
                     count += 1;
                     remainder -= 1;
                 }
-
                 bagelDistribution[toppingId] = count;
             });
 
+            // Correction logic for distribution remains the same
             const finalTotalCheck = Object.values(bagelDistribution).reduce((sum, count) => sum + count, 0);
             if (finalTotalCheck !== expectedTotal) {
                  console.warn("Initial bagel distribution calculation mismatch. Total:", finalTotalCheck, "Expected:", expectedTotal, bagelDistribution);
                  if (selectedToppingIds.length > 0) {
                      const lastToppingId = selectedToppingIds[selectedToppingIds.length - 1];
-                     bagelDistribution[lastToppingId] += (expectedTotal - finalTotalCheck);
+                     bagelDistribution[lastToppingId] = (bagelDistribution[lastToppingId] || 0) + (expectedTotal - finalTotalCheck);
                      if (bagelDistribution[lastToppingId] < 0) bagelDistribution[lastToppingId] = 0;
                  }
             }
-        } 
-    
+        }
+
+        // Create the new item object
         const newItem = {
             productId: customizingItem.id,
-            lineItemId: uuidv4(),
+            // lineItemId will be generated by the context function
             name: `${customizingItem.name} (Customized)`,
             price: finalPrice,
-            quantity: 1,
+            quantity: 1, // Always 1 for customized bagels added this way
             bagelDistribution: bagelDistribution,
+            selectedToppingIds: selectedToppingIds // Include selected toppings if needed later
         };
-    
-        setOrderItems(prevItems => [...prevItems, newItem]);
-    
+
+        // Use the context function to add the fully built item
+        // Ensure addPrebuiltItemToCart exists in your CartContext
+        if (addPrebuiltItemToCart) {
+             addPrebuiltItemToCart(newItem);
+        } else {
+             // Fallback or alternative if addPrebuiltItemToCart isn't defined
+             console.warn("addPrebuiltItemToCart not found in context, using addItemToCart");
+             addItemToCart(newItem, 'bagel'); // May need adjustments in addItemToCart
+        }
+
+
         closeCustomization();
     };
-    
+
+    // handleRemoveItemFromOrder now uses removeItemFromCart from context
     const handleRemoveItemFromOrder = (removalInfo) => {
-        if (!removalInfo || !removalInfo.type || !removalInfo.id) {
-            console.error("Invalid removal info received:", removalInfo);
-            return;
+        // The context function removeItemFromCart expects an object { type, id }
+        // or just the lineItemId, depending on how you defined it.
+        // Adjust the call if necessary based on your CartContext implementation.
+        if (typeof removalInfo === 'object' && removalInfo.type && removalInfo.id) {
+            removeItemFromCart(removalInfo); // Pass the object { type, id }
+        } else if (typeof removalInfo === 'string') {
+            removeItemFromCart({ type: 'lineItem', id: removalInfo }); // Assume it's a lineItemId string
+        } else {
+             console.error("Invalid argument passed to handleRemoveItemFromOrder:", removalInfo);
         }
-    
-        setOrderItems((prevOrderItems) => {
-            if (removalInfo.type === 'lineItem') {
-                console.log(`Removing single item with lineItemId: ${removalInfo.id}`);
-                return prevOrderItems.filter((item) => item.lineItemId !== removalInfo.id);
-            } else if (removalInfo.type === 'product') {
-                console.log(`Removing all items with productId: ${removalInfo.id}`);
-                return prevOrderItems.filter((item) => item.productId !== removalInfo.id);
-            } else {
-                console.error("Unknown removal type:", removalInfo.type);
-                return prevOrderItems;
-            }
-        });
     };
+
+    // --- Calculate cartItemCount for Navbar using cartItems from context ---
+    // Ensure cartItems is always an array, even if initially null/undefined from context
+    const currentCartItems = cartItems || [];
+    const cartItemCount = currentCartItems.reduce((count, item) => count + (Number(item.quantity) || 0), 0);
 
     return (
         <div>
+            {/* Pass cartItemCount derived from context state */}
             <Navbar
-                cartItemCount={orderItems.length}
+                cartItemCount={cartItemCount}
                 className={isModalOpen ? 'navbar-modal-open' : ''}
-                isScrolled={isScrolled} 
-                onCartIconClick={toggleCartDropdown} 
+                isScrolled={isScrolled}
+                onCartIconClick={toggleCartDropdown}
             />
 
+            {/* Pass cartItems from context state */}
             <CartDropdown
                 isOpen={isCartDropdownOpen}
-                orderItems={orderItems}
-                bagelToppings={BAGEL_TOPPINGS}
-                onClose={closeCartDropdown} 
-                onGoToCheckout={handleGoToCheckout}                 
-                isScrolled={isScrolled} 
+                orderItems={currentCartItems} // Use the safe array
+                bagelToppings={BAGEL_TOPPINGS} // Assuming this comes from data/products or props
+                onClose={closeCartDropdown}
+                onGoToCheckout={handleGoToCheckout}
+                isScrolled={isScrolled}
             />
 
+            {/* Home Section remains the same */}
             <section className="home" id="home">
                  <div className="homeSpacer"></div>
                  <div className="heroContainer">
@@ -264,7 +278,8 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
                  </div>
             </section>
 
-            {/* --- Menu Section --- */}
+            {/* --- Menu Section remains the same --- */}
+            {/* Ensure products and availableToppings are available here, either via props or context */}
             <section className="menu" id="menu">
                  <div className="menu-header">
                      <h2>In the Oven:</h2>
@@ -275,11 +290,13 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
                      <img src={bagels} alt="Bagels" className="menu-image" />
                      <div className="menu-text">
                          <h2>BAGELS</h2>
-                         <p>{PRODUCTS.BAGEL_HALF.name}: ${PRODUCTS.BAGEL_HALF.price}</p>
-                         <p>{PRODUCTS.BAGEL_FULL.name}: ${PRODUCTS.BAGEL_FULL.price}</p>
-                         <p>Toppings (+${BAGEL_TOPPINGS.CHEDDAR.additionalCost} each, except Plain):</p>
+                         {/* Use products prop */}
+                         <p>{products?.BAGEL_HALF?.name}: ${products?.BAGEL_HALF?.price}</p>
+                         <p>{products?.BAGEL_FULL?.name}: ${products?.BAGEL_FULL?.price}</p>
+                         <p>Toppings (+${BAGEL_TOPPINGS?.CHEDDAR?.additionalCost || '?.??'} each, except Plain):</p>
                          <ul>
-                            {getAvailableToppings().map(t => <li key={t.id}>{t.name}</li>)}
+                            {/* Use availableToppings prop */}
+                            {(availableToppings || []).map(t => <li key={t.id}>{t.name}</li>)}
                          </ul>
                      </div>
                  </div>
@@ -288,13 +305,14 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
                      <img src={loafs} alt="Loafs" className="menu-image" />
                      <div className="menu-text">
                          <h2>LOAFS</h2>
-                         <p>{PRODUCTS.LOAF_REG.name}: ${PRODUCTS.LOAF_REG.price} (2 for $20 - discount applied at checkout)</p>
-                         <p>Inclusions: ${PRODUCTS.LOAF_PEP_MOZZ.price}</p>
+                         {/* Use products prop */}
+                         <p>{products?.LOAF_REG?.name}: ${products?.LOAF_REG?.price} (2 for $20 - discount applied at checkout)</p>
+                         <p>Inclusions: ${products?.LOAF_PEP_MOZZ?.price}</p>
                          <ul>
-                             <li>{PRODUCTS.LOAF_PEP_MOZZ.name}</li>
-                             <li>{PRODUCTS.LOAF_CHED_JAL.name}</li>
-                             <li>{PRODUCTS.LOAF_CIN_APP.name}</li>
-                             <li>{PRODUCTS.LOAF_EVERY.name}</li>
+                             <li>{products?.LOAF_PEP_MOZZ?.name}</li>
+                             <li>{products?.LOAF_CHED_JAL?.name}</li>
+                             <li>{products?.LOAF_CIN_APP?.name}</li>
+                             <li>{products?.LOAF_EVERY?.name}</li>
                          </ul>
                      </div>
                  </div>
@@ -303,46 +321,46 @@ const HomePage = ({ orderItems, setOrderItems, calculateTotal, onUpdateQuantity,
                      <img src={cookies} alt="Cookies" className="menu-image" />
                      <div className="menu-text">
                          <h2>COOKIES</h2>
-                         <p>{PRODUCTS.COOKIE_CHOC_CHIP.name}: ${PRODUCTS.COOKIE_CHOC_CHIP.price}</p>
-                         {/* Add more cookie types if needed */}
+                         {/* Use products prop */}
+                         <p>{products?.COOKIE_CHOC_CHIP?.name}: ${products?.COOKIE_CHOC_CHIP?.price}</p>
                      </div>
                  </div>
             </section>
 
-            {/* --- Order Modal --- */}
+            {/* --- Pass cart state and context functions to OrderModal --- */}
             <OrderModal
                 isOpen={isModalOpen}
                 onClose={toggleModal}
-                orderItems={orderItems}
-                calculateTotal={calculateTotal}
-                onAddLoaf={addLoafToOrder}
-                onAddCookies={addCookiesToOrder}
-                onCustomizeBagels={startBagelCustomization}
-                onRemoveItem={handleRemoveItemFromOrder}
+                orderItems={currentCartItems} // from context (safe array)
+                calculateTotal={calculateTotal} // from context
+                onAddLoaf={addLoafToOrder} // local handler using context
+                onAddCookies={addCookiesToOrder} // local handler using context
+                onCustomizeBagels={startBagelCustomization} // local handler for modal state
+                onRemoveItem={handleRemoveItemFromOrder} // local handler using context
                 onCheckout={() => {
                     toggleModal();
                     navigate('/checkout');
                 }}
-                products={PRODUCTS}
-                bagelToppings={BAGEL_TOPPINGS}
-                onUpdateQuantity={onUpdateQuantity}
-                onUpdateBagelDistribution={onUpdateBagelDistribution}
+                products={products} // from props
+                bagelToppings={BAGEL_TOPPINGS} // from data/products or props
+                onUpdateQuantity={updateItemQuantity} // from context
+                onUpdateBagelDistribution={updateBagelDistribution} // from context
             />
-            {/* --- Customization Modal --- */}
+
+            {/* --- Customization Modal remains the same --- */}
             <CustomizationModal
                 isOpen={!!customizingItem}
                 onClose={closeCustomization}
                 itemToCustomize={customizingItem}
                 selectedToppingIds={selectedToppingIds}
                 onToppingChange={handleToppingChange}
-                onConfirm={handleConfirmCustomization}
-                availableToppings={getAvailableToppings()}
-                maxToppings={customizingItem?.id === PRODUCTS.BAGEL_HALF.id ? 2 : 4}
-                additionalCostPerTopping={BAGEL_TOPPINGS.CHEDDAR.additionalCost} 
+                onConfirm={handleConfirmCustomization} // local handler using context
+                availableToppings={availableToppings} // from props
+                maxToppings={customizingItem?.id === products?.BAGEL_HALF?.id ? 2 : 4}
+                additionalCostPerTopping={BAGEL_TOPPINGS?.CHEDDAR?.additionalCost || 0} // from data/products or props
             />
         </div>
     );
 };
 
 export default HomePage;
-
