@@ -1,24 +1,20 @@
 {
   "Version": 1,
-  "Hash": "dfAFXJUJ2mfdAy/WIYMz+o9AgLU6P0IGyes1wYShlac=",
+  "Hash": "4DNXS7bZ8HLH3T9Vw+xgb1I49/SK+bZ12pyopmHIbRI=",
   "Source": "BsBakerySPA.Server",
   "BasePath": "_content/BsBakerySPA.Server",
   "Mode": "Default",
   "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
     {
-      "Identity": "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\bsbakeryspa.client\\bsbakeryspa.client.esproj",
-      "Version": 2,
-      "Source": "bsbakeryspa.client",
-      "GetPublishAssetsTargets": "GetCurrentProjectPublishStaticWebAssetItems",
-      "AdditionalPublishProperties": "",
-      "AdditionalPublishPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained",
-      "GetBuildAssetsTargets": "GetCurrentProjectBuildStaticWebAssetItems",
-      "AdditionalBuildProperties": "",
-      "AdditionalBuildPropertiesToRemove": "WebPublishProfileFile;TargetFramework;RuntimeIdentifier;SelfContained"
+      "Name": "BsBakerySPA.Server\\wwwroot",
+      "Source": "BsBakerySPA.Server",
+      "ContentRoot": "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\wwwroot\\",
+      "BasePath": "_content/BsBakerySPA.Server",
+      "Pattern": "**"
     }
   ],
-  "DiscoveryPatterns": [],
   "Assets": [],
   "Endpoints": []
 }

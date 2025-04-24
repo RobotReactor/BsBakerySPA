@@ -1,32 +1,34 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class Order
+namespace BsBakerySPA.Server.Models 
 {
-    [Key]
-    public int OrderId { get; set; } // Or use Guid OrderId { get; set; } = Guid.NewGuid();
+    public class Order
+    {
+        [Key]
+        public int OrderId { get; set; }
 
-    [Required]
-    public DateTime OrderTimestamp { get; set; } = DateTime.UtcNow;
+        [Required]
+        public DateTime OrderTimestamp { get; set; } = DateTime.UtcNow;
 
-    [Required]
-    [MaxLength(50)] // e.g., "Placed", "Preparing", "Ready", "Completed", "Cancelled"
-    public string Status { get; set; } = "Placed"; // Default status
+        [Required]
+        [MaxLength(50)]
+        public string Status { get; set; } = "Placed";
 
-    [Column(TypeName = "decimal(18, 2)")] // Specify SQL data type for currency
-    public decimal TotalAmount { get; set; }
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal TotalAmount { get; set; }
 
-    [Column(TypeName = "decimal(18, 2)")]
-    public decimal DiscountApplied { get; set; } = 0;
+        [Column(TypeName = "decimal(18, 2)")]
+        public decimal DiscountApplied { get; set; } = 0;
 
-    // --- Foreign Key Relationship to User ---
-    [Required]
-    public string UserFirebaseUid { get; set; } // The FK field
+        // --- Foreign Key Relationship to User ---
+        [Required]
+        public string UserFirebaseUid { get; set; } = string.Empty; // Initialize FK
 
-    [ForeignKey("UserFirebaseUid")] // Links to the UserFirebaseUid property above
-    public virtual User User { get; set; } // Navigation property back to the User
+        [ForeignKey("UserFirebaseUid")]
+        public virtual User User { get; set; } = null!; // Use null-forgiving for EF navigation
 
-    // --- Relationship to OrderItems ---
-    // Navigation property: An order contains multiple items
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        // --- Relationship to OrderItems ---
+        public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    }
 }

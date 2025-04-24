@@ -1,6 +1,6 @@
 {
 "SpaProxyServer": {
-"ServerUrl": "https://localhost:63446",
+"ServerUrl": "https://localhost:5173",
 "RedirectUrl": "",
 "LaunchCommand": "npm run dev",
 "WorkingDirectory": "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\..\\bsbakeryspa.client",

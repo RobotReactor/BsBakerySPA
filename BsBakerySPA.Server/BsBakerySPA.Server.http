@@ -1,6 +1,77 @@
-@BsBakerySPA.Server_HostAddress = http://localhost:5285
+@BsBakerySPAServer_HostAddress = https://localhost:5285
+# You will need a valid Firebase ID Token to authorize these requests.
+# Replace <YOUR_FIREBASE_ID_TOKEN> with your actual token.
+@FirebaseToken = eyJhbGciOiJSUzI1NiIsImtpZCI6IjkwOTg1NzhjNDg4MWRjMDVlYmYxOWExNWJhMjJkOGZkMWFiMzRjOGEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vYnMtYmFrZXJ5LWU3ZWYyIiwiYXVkIjoiYnMtYmFrZXJ5LWU3ZWYyIiwiYXV0aF90aW1lIjoxNzQ1NTA1ODU2LCJ1c2VyX2lkIjoiY0ZnY2FLUElaRWNTaThpdU1rZ0dMU3RqTDJIMyIsInN1YiI6ImNGZ2NhS1BJWkVjU2k4aXVNa2dHTFN0akwySDMiLCJpYXQiOjE3NDU1MDU4NTYsImV4cCI6MTc0NTUwOTQ1NiwiZW1haWwiOiJtYXh3ZWxsYm91cmNpZXJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbIm1heHdlbGxib3VyY2llckBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.P7PWFcgfUomSdE33l4X9XeBgk0-_diAMJPzmK4t5q1_TZoB-vde_B9jsFYvyHQgV0riJrssp_SHfC5jmRVmBe2S-NmukigceWSzi-r691-_DNJgD0Cp14A-c-JSrXBD1sTCWGJJNDNZ9MYIzFv75FtFBcSOdNv8iAdYGN4fSgEfpxsDQm5OxbXxms9va188goyCOCYXn0zA0lF_Gumm2R7dnv-UT5Eln_YzZz0SKUxfKnBPK1CB050z1kTr5vcuny1ugN6sKzTbNDC-mLkstAfYcmVWLemBhUxg5Dp1GaWT_bFEazSN4OMv0CVAUT48iWyo5ZNPXBUTt87Z8nyUDEw
 
-GET {{BsBakerySPA.Server_HostAddress}}/weatherforecast/
+###
+# UserController: Get the profile for the currently logged-in user
+# Requires Authorization header
+GET {{BsBakerySPAServer_HostAddress}}/api/user/profile
+Accept: application/json
+Authorization: Bearer {{FirebaseToken}} 
+
+###
+# UserController: Create a user profile after Firebase sign-up
+# Requires Authorization header
+POST {{BsBakerySPAServer_HostAddress}}/api/user
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{FirebaseToken}}
+
+{
+  "firstName": "Max",
+  "lastName": "Well"
+}
+
+###
+# TestController: Create a new TestModel entry
+POST {{BsBakerySPAServer_HostAddress}}/api/test
+Content-Type: application/json
 Accept: application/json
 
+{
+  "name": "My First Test Item"
+}
+
+###
+# TestController: Get all TestModel entries
+GET {{BsBakerySPAServer_HostAddress}}/api/test
+Accept: application/json
+# No Authorization needed
+ 
+###
+# UserController: TEMPORARY - Delete ALL users from the database
+# # WARNING: Destructive action! Use with caution. Only works in DEBUG builds.
+# DELETE {{BsBakerySPAServer_HostAddress}}/api/user/clear-all-users
+# Accept: application/json
+
+###
+# OrderController: Get orders for the currently logged-in user
+# Requires Authorization header
+GET {{BsBakerySPAServer_HostAddress}}/api/order/my
+Accept: application/json
+Authorization: Bearer {{FirebaseToken}}
+
+ 
+###
+# OrderController: Create a new order
+# Requires Authorization header
+POST {{BsBakerySPAServer_HostAddress}}/api/order
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{FirebaseToken}}
+
+{
+  "items": [
+    {
+      "productId": "L001",
+      "quantity": 2
+    },
+    {
+      "productId": "C003",
+      "quantity": 4
+    }
+  ]
+}
+ 
 ###

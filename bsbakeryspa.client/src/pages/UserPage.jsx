@@ -5,60 +5,42 @@ import { useNavigate } from 'react-router-dom';
 // Removed Firestore imports
 import '../styles/UserPage.css'; // Assuming you have styles
 
+const API_BASE_URL = 'http://localhost:5285';
+
 const UserPage = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
-    // Keep profile state if you fetch profile from backend too
-    const [profile, setProfile] = useState({ firstName: '', lastName: '' });
-    const [orders, setOrders] = useState([]); // State for past orders
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [idToken, setIdToken] = useState('');
+    const [loadingToken, setLoadingToken] = useState(true);
+    const [tokenError, setTokenError] = useState('');
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchToken = async () => {
             if (!user) {
-                setLoading(false);
-                return; // Exit if no user
+                setLoadingToken(false);
+                return; // No user, nothing to do
             }
 
-            setLoading(true);
-            setError('');
+            setLoadingToken(true);
+            setTokenError('');
             try {
-                // Get Firebase ID token
+                // Get the Firebase ID token for the current user
                 const token = await user.getIdToken();
-
-                // --- Fetch Profile (Example) ---
-                const profileResponse = await fetch('/api/users/profile', { // Your backend endpoint
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!profileResponse.ok) throw new Error('Failed to fetch profile');
-                const profileData = await profileResponse.json();
-                setProfile(profileData);
-
-                // --- Fetch Past Orders ---
-                const ordersResponse = await fetch('/api/orders/my', { // Your backend endpoint
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (!ordersResponse.ok) throw new Error('Failed to fetch orders');
-                const ordersData = await ordersResponse.json();
-                setOrders(ordersData);
-
+                setIdToken(token);
             } catch (err) {
-                console.error("Error fetching user data:", err);
-                setError(err.message || "Failed to load user data.");
+                console.error("Error fetching Firebase ID token:", err);
+                setTokenError("Could not retrieve authentication token. Please try logging out and back in.");
+                setIdToken(''); // Clear any previous token
             } finally {
-                setLoading(false);
+                setLoadingToken(false);
             }
         };
 
-        fetchData();
-    }, [user]); // Re-run when user object changes
+        fetchToken();
+    }, [user]); // Re-run when the user object changes
 
     const handleLogout = async () => {
+        // ... (logout logic remains the same)
         try {
             await logout();
             navigate('/');
@@ -67,55 +49,54 @@ const UserPage = () => {
         }
     };
 
-    // Helper to format date (optional)
-    const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
+    const handleTokenClick = (event) => {
+        event.target.select();
         try {
-            return new Date(dateString).toLocaleString();
-        } catch (e) {
-            return dateString; // Fallback
+            document.execCommand('copy');
+            // Optional: Add feedback like "Copied!"
+        } catch (err) {
+            console.error('Failed to copy token automatically');
         }
     }
 
+
+    // --- JSX remains largely the same ---
     return (
         <div className="user-page">
-            <h1>User Profile</h1>
-            {loading ? (
-                <p>Loading...</p>
-            ) : error ? (
-                 <p className="error-message">{error}</p>
-            ) : user ? (
-                <>
-                    {/* Display profile info */}
-                    <p>Welcome, {profile?.firstName || user.displayName || "User"}!</p>
-                    <p>Email: {user.email || "N/A"}</p>
-                    {profile?.lastName && <p>Last Name: {profile.lastName}</p>}
+            <h1>User Info</h1>
 
-                    {/* Display Past Orders */}
-                    <div className="past-orders">
-                        <h2>Your Past Orders</h2>
-                        {orders.length > 0 ? (
-                            <ul>
-                                {orders.map((order) => (
-                                    <li key={order.orderId}> {/* Use your order ID key */}
-                                        <span>Order Date: {formatDate(order.orderTimestamp)}</span>
-                                        <span>Status: {order.status}</span>
-                                        <span>Total: ${order.totalAmount?.toFixed(2)}</span>
-                                        {/* Add link/button to view order details if needed */}
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p>You have no past orders.</p>
-                        )}
+            {!user ? (
+                <p>Please log in.</p>
+            ) : (
+                <>
+                    <div className="user-info-section">
+                        <h2>Email</h2>
+                        <p>{user.email || "N/A"}</p>
                     </div>
 
-                    <button onClick={handleLogout}>Logout</button>
+                    <div className="user-info-section">
+                        <h2>Firebase ID Token</h2>
+                        {loadingToken ? (
+                            <p>Loading token...</p>
+                        ) : tokenError ? (
+                            <p className="error-message">{tokenError}</p>
+                        ) : (
+                            <textarea
+                                readOnly
+                                value={idToken}
+                                onClick={handleTokenClick} // Select all on click for easy copying
+                                style={{ width: '100%', minHeight: '100px', wordBreak: 'break-all', fontFamily: 'monospace' }}
+                                aria-label="Firebase ID Token"
+                            />
+                        )}
+                    </div>
                 </>
-            ) : (
-                <p>Please log in to view your profile.</p>
             )}
-            <button onClick={() => navigate('/')}>Back to Home</button>
+
+            <div className="user-page-actions">
+                {user && <button onClick={handleLogout}>Logout</button>}
+                <button onClick={() => navigate('/')}>Back to Home</button>
+            </div>
         </div>
     );
 };
