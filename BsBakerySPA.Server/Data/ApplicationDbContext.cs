@@ -22,7 +22,6 @@ namespace BsBakerySPA.Server.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // User Configuration (Existing)
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(u => u.FirebaseUid);
@@ -35,7 +34,6 @@ namespace BsBakerySPA.Server.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Order Configuration (Existing)
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.HasKey(o => o.OrderId);
@@ -48,7 +46,6 @@ namespace BsBakerySPA.Server.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // OrderItem Configuration (Existing)
             modelBuilder.Entity<OrderItem>(entity =>
             {
                 entity.HasKey(oi => oi.OrderItemId);
@@ -56,17 +53,14 @@ namespace BsBakerySPA.Server.Data
                 entity.Property(oi => oi.PricePerItem).HasColumnType("decimal(18,2)");
             });
 
-            // Product Configuration
             modelBuilder.Entity<Product>(entity =>
             {
-                // Key is already defined via [Key] attribute on the string Id
                 entity.Property(p => p.Price).HasColumnType("decimal(18,2)");
                 entity.Property(p => p.Category).HasMaxLength(50);
                 entity.Property(p => p.Name).HasMaxLength(100);
                 entity.Property(p => p.Description).HasMaxLength(500);
             });
 
-            // BagelTopping Configuration
             modelBuilder.Entity<BagelTopping>(entity =>
             {
                 entity.Property(bt => bt.Name).HasMaxLength(100);
@@ -82,16 +76,13 @@ namespace BsBakerySPA.Server.Data
             );
 
             modelBuilder.Entity<Product>().HasData(
-                // Loafs
                 new Product { Id = "L001", Name = "Regular", Category = "Loaf", Price = 12.00m },
                 new Product { Id = "L002", Name = "Pepperoni Mozzarella", Category = "Loaf", Price = 14.00m },
                 new Product { Id = "L003", Name = "Cheddar Jalapeño", Category = "Loaf", Price = 14.00m },
                 new Product { Id = "L004", Name = "Cinnamon Apple", Category = "Loaf", Price = 14.00m },
                 new Product { Id = "L005", Name = "Everything Loaf", Category = "Loaf", Price = 14.00m },
-                // Bagels
                 new Product { Id = "B001", Name = "1/2 Dozen Bagels", Category = "Bagel", Price = 12.00m },
                 new Product { Id = "B002", Name = "Dozen Bagels", Category = "Bagel", Price = 22.00m }, 
-                // Cookies
                 new Product { Id = "C001", Name = "Chocolate Chip Cookies (Dozen)", Category = "Cookie", Price = 20.00m } 
             );
         }

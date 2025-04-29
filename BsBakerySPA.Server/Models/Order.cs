@@ -21,14 +21,12 @@ namespace BsBakerySPA.Server.Models
         [Column(TypeName = "decimal(18, 2)")]
         public decimal DiscountApplied { get; set; } = 0;
 
-        // --- Foreign Key Relationship to User ---
         [Required]
-        public string UserFirebaseUid { get; set; } = string.Empty; // Initialize FK
+        public string UserFirebaseUid { get; set; } = string.Empty;
 
         [ForeignKey("UserFirebaseUid")]
-        public virtual User User { get; set; } = null!; // Use null-forgiving for EF navigation
+        public virtual User User { get; set; } = null!; 
 
-        // --- Relationship to OrderItems ---
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

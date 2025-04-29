@@ -10,7 +10,7 @@ namespace BsBakerySPA.Server.Models
 
         [Required]
         [MaxLength(50)]
-        public string ProductId { get; set; } = string.Empty; // Initialize
+        public string ProductId { get; set; } = string.Empty; 
 
         [Required]
         public int Quantity { get; set; }
@@ -22,11 +22,10 @@ namespace BsBakerySPA.Server.Models
         public string? SelectedToppingIdsJson { get; set; }
         public string? BagelDistributionJson { get; set; }
 
-        // --- Foreign Key Relationship to Order ---
         [Required]
         public int OrderId { get; set; }
 
         [ForeignKey("OrderId")]
-        public virtual Order Order { get; set; } = null!; // Use null-forgiving for EF navigation
+        public virtual Order Order { get; set; } = null!; 
     }
 }
