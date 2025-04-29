@@ -1,4 +1,3 @@
-// src/components/SignUpModal/SignUpModal.jsx
 import React from 'react';
 import '../../styles/SignUpModal.css';
 
@@ -16,26 +15,20 @@ const SignUpModal = ({
     setConfirmPassword,
     error,
     onClose,
-    onSignUp // This function comes from LoginPage and handles the logic
-    // Removed setError and setLoading from internal scope as they are not needed here
+    onSignUp 
 }) => {
     if (!isOpen) {
         return null;
     }
 
-    // --- Remove the internal handleSignUp function (lines 24-44) ---
-    // const handleSignUp = async (e) => { ... }; // DELETE THIS FUNCTION
 
-    // Function to handle form submission
     const handleSubmit = (e) => {
-        e.preventDefault(); // Prevent default form submission
-        onSignUp(); // Call the function passed from LoginPage
+        e.preventDefault(); 
+        onSignUp(); 
     };
 
     return (
-        // Add onClick handler to the backdrop to close the modal (optional but good UX)
         <div className="login-modal" onClick={onClose}>
-            {/* Prevent clicks inside the content from closing the modal */}
             <form className="login-modal-content" onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
                 <h2>Sign Up</h2>
                 <div className='name-fields'>
@@ -45,7 +38,7 @@ const SignUpModal = ({
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
-                        autoComplete="given-name" // Add autocomplete
+                        autoComplete="given-name" 
                     />
                     <input
                         type="text"
@@ -53,7 +46,7 @@ const SignUpModal = ({
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
-                        autoComplete="family-name" // Add autocomplete
+                        autoComplete="family-name"
                     />
                 </div>
                 <input
@@ -62,7 +55,7 @@ const SignUpModal = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    autoComplete="email" // Add autocomplete
+                    autoComplete="email"
                 />
                 <input
                     type="password"
@@ -70,7 +63,7 @@ const SignUpModal = ({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    autoComplete="new-password" // Add autocomplete
+                    autoComplete="new-password"
                 />
                 <input
                     type="password"
@@ -78,13 +71,10 @@ const SignUpModal = ({
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
-                    autoComplete="new-password" // Add autocomplete
+                    autoComplete="new-password"
                 />
-                {/* Display the error passed down from LoginPage */}
                 {error && <p className="error">{error}</p>}
-                {/* Change button type to submit and remove onClick */}
                 <button type='submit' className='signup-button'>Sign Up</button>
-                {/* Keep cancel button type as button */}
                 <button type='button' className='cancel-button' onClick={onClose}>Cancel</button>
             </form>
         </div>

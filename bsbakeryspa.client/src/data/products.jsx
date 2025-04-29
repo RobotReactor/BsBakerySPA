@@ -1,5 +1,4 @@
 export const PRODUCTS = {
-    // Loaves
     LOAF_REG: { id: 'L001', name: 'Regular', price: 12, category: 'Loaf' },
     LOAF_PEP_MOZZ: { id: 'L002', name: 'Pepperoni Mozzarella', price: 14, category: 'Loaf' },
     LOAF_CHED_JAL: { id: 'L003', name: 'Cheddar Jalapeño', price: 14, category: 'Loaf' },

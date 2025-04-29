@@ -25,11 +25,9 @@ const Navbar = ({ cartItemCount, className, isScrolled, onCartIconClick }) => {
 
     const renderUserSection = () => {
         if (loadingProfile) {
-            // Optionally show a loading indicator while profile fetches
             return <span className="welcome-message">Loading...</span>;
         }
         if (user && userProfile) {
-            // User is logged in AND profile data is loaded
             return (
                 <>
                     <span className="welcome-message">Welcome, {userProfile.firstName}!</span>
@@ -61,7 +59,6 @@ const Navbar = ({ cartItemCount, className, isScrolled, onCartIconClick }) => {
             <div className="navbar-right">
                 {renderUserSection()}
 
-                {/* Cart Icon and Badge */}
                 <div className="cart-icon-container" onClick={onCartIconClick}>
                     <FaShoppingCart className="icon" />
                     {cartItemCount > 0 && (

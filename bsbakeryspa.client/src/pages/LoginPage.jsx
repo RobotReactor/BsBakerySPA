@@ -6,7 +6,7 @@ import { getAuth, getIdToken } from "firebase/auth";
 
 import '../styles/LoginPage.css';
 
-import SignUpModal from '../components/SignUpModal/SignUpModal';
+import SignUpModal from '../components/SignUpModal/SignUpModal.jsx';
 
 const LoginPage = () => {
     const { login, signUp, guestSignIn, user } = useAuth();

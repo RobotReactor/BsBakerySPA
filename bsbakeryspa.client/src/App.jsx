@@ -1,8 +1,7 @@
-import React from 'react'; // Removed useState
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './styles/App.css';
 
-// Import Pages
 import HomePage from './pages/HomePage';
 import Checkout from './pages/CheckoutPage.jsx';
 import Payment from './pages/PaymentPage';

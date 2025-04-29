@@ -1,31 +1,27 @@
-// src/components/OrderModal/OrderModal.jsx
 import React from 'react';
 import { FaTimes, FaTrashAlt, FaPlus, FaMinus } from 'react-icons/fa';
-import '../../styles/OrderModal.css'; // Make sure this path is correct
+import '../../styles/OrderModal.css'; 
 
-// The props received from HomePage (which gets cart data from useCart)
 const OrderModal = ({
     isOpen,
     onClose,
-    orderItems, // Should be cartItems from context, passed by HomePage
-    calculateTotal, // Should be calculateTotal from context, passed by HomePage
-    onAddLoaf, // Handler from HomePage
-    onAddCookies, // Handler from HomePage
-    onCustomizeBagels, // Handler from HomePage (starts customization state)
-    onRemoveItem, // Handler from HomePage (calls context function)
-    onCheckout, // Handler from HomePage
-    products, // Static data from HomePage props
-    bagelToppings, // Static data from HomePage props
-    onUpdateQuantity, // Should be updateItemQuantity from context, passed by HomePage
-    onUpdateBagelDistribution // Should be updateBagelDistribution from context, passed by HomePage
+    orderItems, 
+    calculateTotal,
+    onAddLoaf, 
+    onAddCookies, 
+    onCustomizeBagels,
+    onRemoveItem, 
+    onCheckout,
+    products, 
+    bagelToppings, 
+    onUpdateQuantity,
+    onUpdateBagelDistribution 
 }) => {
     if (!isOpen) {
         return null;
     }
 
-    // --- Helper Functions (Mostly Unchanged) ---
 
-    // Calls the handler passed from HomePage to start customization
     const handleCustomizeClick = (product) => {
         if (product && onCustomizeBagels) {
             onCustomizeBagels(product);
@@ -34,14 +30,11 @@ const OrderModal = ({
         }
     };
 
-    // Prevents clicks inside modal from closing it
     const handleContentClick = (e) => {
         e.stopPropagation();
     };
 
-    // Gets topping name based on ID, using the passed bagelToppings prop
     const getToppingName = (id) => {
-        // Ensure bagelToppings is an object before trying Object.values
         if (bagelToppings && typeof bagelToppings === 'object') {
             const toppingsArray = Object.values(bagelToppings);
             const topping = toppingsArray.find(t => t && t.id === id);
@@ -50,33 +43,30 @@ const OrderModal = ({
             }
         }
         console.warn(`Topping name not found for ID: ${id}`);
-        return id; // Return ID as fallback
+        return id; 
     };
 
-    // Groups items for display (logic remains the same, relies on orderItems prop)
     const groupAndPrepareDisplayItems = (items) => {
         const groupedNonBagels = {};
         const individualBagels = [];
 
-        // Use items || [] to safely handle potential undefined prop initially
         (items || []).forEach(item => {
-            if (!item || !item.productId) return; // Basic check for valid item
+            if (!item || !item.productId) return; 
 
             if (item.productId.startsWith('B')) {
-                // Bagels are always treated individually in the modal display
+
                 individualBagels.push({
                     ...item,
                     quantity: Number(item.quantity) || 1,
-                    displayKey: item.lineItemId // Use unique lineItemId as key
+                    displayKey: item.lineItemId
                 });
             } else {
-                // Group non-bagels by productId
                 const groupKey = item.productId;
                 if (!groupedNonBagels[groupKey]) {
                     groupedNonBagels[groupKey] = {
-                        ...item, // Copy properties from the first item encountered
+                        ...item, 
                         quantity: 0,
-                        originalLineItemIds: [], // Store original IDs if needed for updates
+                        originalLineItemIds: [], 
                         displayKey: groupKey
                     };
                 }
@@ -84,21 +74,16 @@ const OrderModal = ({
                 groupedNonBagels[groupKey].originalLineItemIds.push(item.lineItemId);
             }
         });
-        // Combine individual bagels and grouped items for rendering
         return [...individualBagels, ...Object.values(groupedNonBagels)];
     };
 
-    // Prepare items for display using the orderItems prop
     const displayItems = groupAndPrepareDisplayItems(orderItems);
 
-    // Handles quantity change for grouped non-bagel items
     const handleGroupedQuantityClick = (groupedItem, change) => {
-        // Ensure the update function is passed correctly
         if (!onUpdateQuantity) {
             console.error("OrderModal: onUpdateQuantity prop is missing!");
             return;
         }
-        // Use the first original lineItemId to update the quantity in the context
         if (groupedItem.originalLineItemIds && groupedItem.originalLineItemIds.length > 0) {
             const targetLineItemId = groupedItem.originalLineItemIds[0];
             onUpdateQuantity(targetLineItemId, change);
@@ -107,28 +92,23 @@ const OrderModal = ({
         }
     };
 
-    // Handles changing topping counts for individual bagels
     const handleToppingChangeClick = (lineItemId, toppingId, change) => {
-        // Find the specific bagel item using lineItemId
         const item = (orderItems || []).find(i => i.lineItemId === lineItemId);
         if (!item || !item.productId?.startsWith('B')) {
             console.error("Cannot update toppings: Item not found or not a bagel.", lineItemId);
             return;
         }
 
-        // --- Validation Logic (Remains the same) ---
         const currentDistribution = item.bagelDistribution || {};
         const currentToppingCount = Number(currentDistribution[toppingId]) || 0;
         const newToppingCount = currentToppingCount + change;
 
-        // Min 3 validation
-        if (change < 0 && newToppingCount < 3 && currentToppingCount >= 3) { // Only alert when crossing the threshold
+        if (change < 0 && newToppingCount < 3 && currentToppingCount >= 3) { 
              alert('Minimum of 3 required per selected topping. Remove topping if needed.');
              console.log('Validation failed: Minimum 3 per topping.');
              return;
         }
 
-        // Max total validation
         const expectedTotal = item.productId === 'B001' ? 6 : (item.productId === 'B002' ? 12 : 0);
         if (expectedTotal > 0) {
             const currentTotalSum = Object.values(currentDistribution).reduce((sum, count) => sum + (Number(count) || 0), 0);
@@ -138,9 +118,7 @@ const OrderModal = ({
                 return;
             }
         }
-        // --- End Validation ---
 
-        // Call the update function passed from context via HomePage
         if (onUpdateBagelDistribution) {
             onUpdateBagelDistribution(lineItemId, toppingId, change);
         } else {
@@ -148,37 +126,29 @@ const OrderModal = ({
         }
     };
 
-    // Checks if bagel distribution count matches expected total (logic remains same)
     const isBagelDistributionCorrect = (item) => {
         if (!item.productId?.startsWith('B') || !item.bagelDistribution) {
-            return true; // Not a bagel or no distribution = correct by default
+            return true; 
         }
         const expectedTotal = item.productId === 'B001' ? 6 : (item.productId === 'B002' ? 12 : 0);
-        if (expectedTotal === 0) return true; // Unknown bagel type?
+        if (expectedTotal === 0) return true; 
 
         const currentTotal = Object.values(item.bagelDistribution).reduce((sum, count) => sum + (Number(count) || 0), 0);
         return currentTotal === expectedTotal;
     };
 
-    // --- Calculate Subtotal using the function passed from context ---
-    // Ensure calculateTotal is a function before calling
     const subtotal = Number(calculateTotal) || 0; 
 
-    // --- Determine if checkout is allowed ---
     const canCheckout = (orderItems || []).length > 0 &&
                         (orderItems || []).every(item => !item.productId?.startsWith('B') || isBagelDistributionCorrect(item));
 
-
-    // --- Render Logic ---
     return (
         <div className={"modal"} onClick={onClose}>
             <div className={"modal-content"} onClick={handleContentClick}>
                 <FaTimes className={"modal-close-icon"} onClick={onClose} />
 
-                {/* Left Side: Add Items (Unchanged) */}
                 <div className={"modal-left"}>
                    <h2>Add Items</h2>
-                   {/* Loafs */}
                    <div className={"modal-item"}>
                        <h3>Loafs</h3>
                        <ul className={"loaf-option"}>
@@ -189,7 +159,6 @@ const OrderModal = ({
                            <li onClick={() => onAddLoaf(products?.LOAF_EVERY)}>Everything (${products?.LOAF_EVERY?.price?.toFixed(2) || '?.??'})</li>
                        </ul>
                    </div>
-                   {/* Bagels */}
                    <div className={"modal-item"}>
                        <h3>Bagels</h3>
                        <ul className={"bagel-options"}>
@@ -201,7 +170,6 @@ const OrderModal = ({
                            </li>
                        </ul>
                    </div>
-                   {/* Cookies */}
                     <div className={"modal-item"}>
                         <h3>Cookies</h3>
                         <ul className={"cookie-options"}>
@@ -210,17 +178,14 @@ const OrderModal = ({
                     </div>
                 </div>
 
-                {/* Right Side: Order Summary */}
                 <div className={"modal-right"}>
                      <h2>Your Current Basket</h2>
-                     {/* Use displayItems derived from orderItems prop */}
                      {displayItems.length === 0 ? (
                          <p>Your basket is empty.</p>
                      ) : (
                          <>
                          <ul className={"order-list"}>
                             {displayItems.map((item) => {
-                                // --- Logic for display remains mostly the same ---
                                 const isBagel = item.productId?.startsWith('B');
                                 const itemHasError = isBagel && !isBagelDistributionCorrect(item);
                                 const expectedTotal = item.productId === 'B001' ? 6 : (item.productId === 'B002' ? 12 : 0);
@@ -229,10 +194,8 @@ const OrderModal = ({
                                 const distribution = item.bagelDistribution || {};
                                 const numberOfToppings = Object.keys(distribution).length;
                                 const isFullDozen = item.productId === products?.BAGEL_FULL?.id;
-                                // Show controls for full dozen with 2 or 3 toppings
                                 const showToppingControls = isBagel && isFullDozen && (numberOfToppings === 2 || numberOfToppings === 3);
 
-                                // Generate Display Name
                                 let displayName = item.name || 'Unnamed Item';
                                 if (isBagel && item.bagelDistribution && Object.keys(item.bagelDistribution).length > 0 && !showToppingControls) {
                                     const baseName = item.name.replace(/\s*\(Customized\)/i, '');
@@ -244,11 +207,9 @@ const OrderModal = ({
                                 } else if (isBagel) {
                                     displayName = item.name.replace(/\s*\(Customized\)/i, '');
                                 }
-                                // --- End Display Name ---
 
                                 return (
                                     <li key={item.displayKey} className={`order-item ${itemHasError ? 'item-error' : ''}`}>
-                                        {/* Item Info */}
                                         <div className="item-info">
                                             {displayName} - ${item.price?.toFixed(2) || '?.??'}
                                             {isBagel && item.bagelDistribution && showToppingControls && (
@@ -262,7 +223,7 @@ const OrderModal = ({
                                                                 <div className="topping-controls">
                                                                     <button
                                                                         onClick={() => handleToppingChangeClick(item.lineItemId, toppingId, -1)}
-                                                                        disabled={count <= 3} // Use count directly
+                                                                        disabled={count <= 3} 
                                                                         aria-label={`Decrease ${getToppingName(toppingId)}`}
                                                                     > <FaMinus /> </button>
                                                                     <button
@@ -288,7 +249,7 @@ const OrderModal = ({
                                                     <button onClick={() => handleGroupedQuantityClick(item, 1)} aria-label="Increase quantity"> <FaPlus /> </button>
                                                 </>
                                             ) : (
-                                                 <span className="bagel-quantity-display">Qty: {item.quantity}</span> // Bagel quantity not directly editable here
+                                                 <span className="bagel-quantity-display">Qty: {item.quantity}</span> 
                                             )}
                                         </div>
 

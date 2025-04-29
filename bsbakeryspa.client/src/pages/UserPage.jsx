@@ -26,27 +26,22 @@ const UserPage = () => {
     const [isBakingMode, setIsBakingMode] = useState(false);
     const BAKING_RELEVANT_STATUSES = ["Placed", "Preparing"]; 
 
-    // --- Helper functions ---
     const getToppingName = (id) => {
-        const topping = getToppingById(id); // Use imported helper
+        const topping = getToppingById(id); 
         return topping ? topping.name : 'Unknown Topping';
     };
 
     const getProductName = (id) => {
-        const product = getProductById(id); // Use imported helper
-        // Handle potential variations in product names (e.g., removing "(Dozen)")
+        const product = getProductById(id); 
         return product ? product.name.replace(/\s*\(Dozen\)/i, '') : 'Unknown Product';
     };
 
-    // --- Fetch User's Orders ---
     useEffect(() => {
-        // Redirect if not logged in after auth check
         if (!loadingAuth && !user) {
             navigate('/login');
-            return; // Stop execution if redirecting
+            return; 
         }
 
-        // Fetch user's orders only if logged in AND not an admin
         if (user && !isAdmin) {
             const fetchMyOrders = async () => {
                 setIsLoadingMyOrders(true);
@@ -61,10 +56,8 @@ const UserPage = () => {
                     }
                     const data = await response.json();
 
-                    // Handle potential $values from ReferenceHandler.Preserve
                     let ordersArray = data?.$values || (Array.isArray(data) ? data : []);
 
-                    // Process orders: parse JSON strings
                     const processed = ordersArray.map(order => ({
                         ...order,
                         orderItems: (order.orderItems?.$values || order.orderItems || []).map(item => ({
