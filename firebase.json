@@ -16,11 +16,20 @@
     ],
     "rewrites": [
       {
+        "source": "**/*.js",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/javascript"
+          }
+        ]
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
     ],
-    "appAssociation": "AUTO" 
+    "appAssociation": "AUTO"
   },
   "headers": [
     {
