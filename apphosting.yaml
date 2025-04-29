@@ -1,5 +1,8 @@
 sourceDir: BsBakerySPA.Server
 
+build:
+  runtime: dotnet 
+
 runConfig:
   minInstances: 0
 
