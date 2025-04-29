@@ -17,49 +17,45 @@
     "rewrites": [
       {
         "source": "**/*.js",
-        "headers": [
-          {
-            "key": "Content-Type",
-            "value": "application/javascript"
-          }
-        ]
+        "destination": "**/*.js",
+        "type": "application/javascript"
       },
       {
         "source": "**",
         "destination": "/index.html"
       }
     ],
-    "appAssociation": "AUTO"
+    "appAssociation": "AUTO",
+    "headers": [
+      {
+        "source": "/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/styles.css",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=3600"
+          }
+        ]
+      },
+      {
+        "source": "/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      }
+    ]
   },
-  "headers": [
-    {
-      "source": "/index.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/styles.css",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "max-age=3600"
-        }
-      ]
-    },
-    {
-      "source": "/**",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "max-age=31536000"
-        }
-      ]
-    }
-  ],
   "functions": [
     {
       "source": "functions",
