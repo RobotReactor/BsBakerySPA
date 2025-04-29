@@ -4,7 +4,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Darkened background */
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -28,16 +28,15 @@
     width: 1000px;
 }
 
-/* Close Icon */
 .modal-close-icon {
     position: absolute;
     top: 10px;
     right: 10px;
-    font-size: 2rem; /* Adjust size as needed */
+    font-size: 2rem;
     color: #666;
     cursor: pointer;
     transition: color 0.3s ease;
-    z-index: 20; /* Ensure it stays above the modal content */
+    z-index: 20; 
 }
 
 .modal-close-icon:hover {
@@ -54,7 +53,6 @@
     flex: 1;
 }
 
-/* Modal Content */
 .modal-content {
     position: relative;
     background-color: #ffffff;
@@ -63,20 +61,19 @@
     overflow: hidden;
     display: flex;
     flex-direction: row;
-    width: 90%; /* Increased modal width */
-    max-width: 1200px; /* Adjusted max width */
-    height: 600px; /* Increased height */
+    width: 90%; 
+    max-width: 1200px; 
+    height: 600px; 
 }
 
-/* Modal Left */
 .modal-left {
-    border-right: 1px solid #e0e0e0; /* Divider between columns */
+    border-right: 1px solid #e0e0e0; 
     padding: 20px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Space between items */
-    overflow-y: auto; /* Enable scrolling if content overflows */
+    gap: 20px; 
+    overflow-y: auto; 
 }
 
 .modal-left h2 {
@@ -123,8 +120,8 @@
     padding: 0;
     margin: 0;
     display: flex;
-    flex-wrap: wrap; /* Wrap options into multiple rows if needed */
-    gap: 10px; /* Space between options */
+    flex-wrap: wrap;
+    gap: 10px; 
     justify-content: center;
 }
 
@@ -150,7 +147,7 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Space between loaf options */
+    gap: 10px; 
 }
 
 .loaf-options li {
@@ -169,7 +166,6 @@
     color: rgb(49, 49, 49);
 }
 
-/* Cookie Options */
 .cookie-options {
     list-style: none;
     padding: 0;
@@ -207,10 +203,10 @@
 
 .order-list {
     display: grid;
-    grid-template-columns: repeat(1, 1fr); /* 2-column grid */
-    gap: 10px; /* Space between grid items */
-    overflow-y: auto; /* Enables vertical scrolling if content overflows */
-    max-height: calc(100% - 60px); /* Leaves space for the total at the bottom */
+    grid-template-columns: repeat(1, 1fr); 
+    gap: 10px;
+    overflow-y: auto; 
+    max-height: calc(100% - 60px);
     padding: 0;
     margin: 0;
     list-style: none;
@@ -219,14 +215,13 @@
 
 .order-item {
     display: flex;
-    justify-content: space-between; /* Pushes icon to the right */
-    align-items: center;    /* Vertically centers icon */
-    padding: 10px;          /* Combined padding */
-    border-radius: 5px;     /* From first definition */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* From first definition */
-    margin-bottom: 10px;    /* From first definition */
-    background-color: #f9f9f9; /* From first definition */
-    /* border-bottom: 1px solid #eee; */ /* Choose one border style or combine */
+    justify-content: space-between;
+    align-items: center;   
+    padding: 10px;          
+    border-radius: 5px;     
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    margin-bottom: 10px;    
+    background-color: #f9f9f9; 
 }
 
 .order-item.item-error {
@@ -234,19 +229,16 @@
     border: 1px solid #d9534f; 
   }
 
-/* Ensure the icon itself doesn't have conflicting margins */
 .order-item .remove-item-icon {
   cursor: pointer;
   color: #d9534f;
   padding: 0px;
-  /* margin-left: 0; */ /* Ensure no left margin */
 }
 .order-item .remove-item-icon:hover {
   color: #a00;
 
 }
 
-/* Keep rules for .item-info, .quantity-controls-modal etc. */
 .order-item .item-info {
     flex-grow: 1;
     margin-right: 10px;
@@ -279,37 +271,34 @@
     margin-bottom: 2px;
   }
   
-  /* Container for the topping name and count */
   .topping-details {
-    flex-grow: 1;           /* Allow details to take up available space */
-    margin-right: 10px;     /* Add space before the controls */
+    flex-grow: 1;           
+    margin-right: 10px;    
   }
   
-  /* Container for the +/- buttons */
   .topping-controls {
-    display: flex;          /* Arrange buttons horizontally */
-    align-items: center;    /* Align buttons vertically */
-    gap: 5px;               /* Add space between the buttons */
+    display: flex;          
+    align-items: center;    
+    gap: 5px;              
   }
   
-  /* Style for the individual +/- buttons */
   .topping-controls button {
-    background-color: #eee; /* Light grey background */
+    background-color: #eee;
     border: 1px solid #ccc;
-    border-radius: 4px;     /* Slightly rounded corners */
-    padding: 2px 6px;       /* Small padding */
+    border-radius: 4px;    
+    padding: 2px 6px;    
     cursor: pointer;
-    font-size: 0.8em;       /* Smaller font size for buttons */
-    line-height: 1;         /* Ensure icon fits well */
-    transition: background-color 0.2s ease; /* Smooth hover effect */
+    font-size: 0.8em;       
+    line-height: 1;        
+    transition: background-color 0.2s ease;
   }
   
   .topping-controls button:hover:not(:disabled) {
-    background-color: #ddd; /* Darker grey on hover */
+    background-color: #ddd; 
   }
   
   .topping-controls button:disabled {
-    opacity: 0.5;           /* Make disabled buttons look faded */
+    opacity: 0.5;         
     cursor: not-allowed;
   }
 
@@ -383,7 +372,7 @@
   }
   
   .order-item .quantity-controls-modal span {
-      min-width: 15px; /* Give quantity number some space */
+      min-width: 15px;
       text-align: center;
   }
 
@@ -399,7 +388,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 20px; /* Space between customize and remove icon */
+    margin-left: 20px; 
 }
 
 .remove-icon {

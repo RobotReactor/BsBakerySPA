@@ -7,6 +7,9 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+
 
 namespace BsBakerySPA.Server.Controllers
 {
@@ -16,11 +19,14 @@ namespace BsBakerySPA.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<UserController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public UserController(ApplicationDbContext context, ILogger<UserController> logger)
+
+        public UserController(ApplicationDbContext context, ILogger<UserController> logger, IConfiguration configuration)
         {
             _context = context;
             _logger = logger;
+            _configuration = configuration;
         }
 
         // --- Existing GetUserProfileAsync method ---
@@ -28,8 +34,7 @@ namespace BsBakerySPA.Server.Controllers
         [Authorize]
         public async Task<IActionResult> GetUserProfileAsync()
         {
-            // ... (keep existing code here) ...
-             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
             {
                 _logger.LogWarning("User ID claim (NameIdentifier) not found in token.");
@@ -37,6 +42,9 @@ namespace BsBakerySPA.Server.Controllers
             }
 
             _logger.LogInformation("Attempting to get profile for user FirebaseUid: {UserId}", userId);
+
+            // Determine if the user is an admin
+            bool isAdmin = CheckIfUserIsAdmin(userId);
 
             try
             {
@@ -50,6 +58,7 @@ namespace BsBakerySPA.Server.Controllers
                                                     LastName = u.LastName ?? string.Empty,
                                                     Email = u.Email ?? string.Empty,
                                                     CreatedAt = u.CreatedAt
+                                                    // IsAdmin will be set below
                                                 })
                                                 .FirstOrDefaultAsync();
 
@@ -59,8 +68,13 @@ namespace BsBakerySPA.Server.Controllers
                     return NotFound("User profile not found.");
                 }
 
-                _logger.LogInformation("Successfully retrieved profile for user FirebaseUid: {UserId}", userId);
-                return Ok(userProfile);
+                // --- Assign the calculated admin status to the DTO ---
+                userProfile.IsAdmin = isAdmin;
+                // ---
+
+                // Log the status being sent back
+                _logger.LogInformation("Successfully retrieved profile for user FirebaseUid: {UserId}. IsAdmin: {IsAdmin}", userId, userProfile.IsAdmin);
+                return Ok(userProfile); // Return the DTO with the IsAdmin flag set
             }
             catch (Exception ex)
             {
@@ -69,36 +83,35 @@ namespace BsBakerySPA.Server.Controllers
             }
         }
 
-        // [HttpDelete("clear-all-users")] // Use a distinct route
-        // public async Task<IActionResult> ClearAllUsers()
-        // {
-        //     _logger.LogWarning("Executing temporary endpoint to clear ALL users from the database.");
-        //     try
-        //     {
-        //         // Efficiently delete all rows without loading them into memory
-        //         int rowsAffected = await _context.Users.ExecuteDeleteAsync();
+        private bool CheckIfUserIsAdmin(string firebaseUid)
+        {
+            _logger.LogInformation("--- CheckIfUserIsAdmin ---"); // Log entry point
+            _logger.LogInformation("Checking admin status for Firebase UID: '{FirebaseUid}'", firebaseUid); // Log the UID received
 
-        //         // Alternatively, if ExecuteDeleteAsync isn't available or you prefer:
-        //         // var allUsers = await _context.Users.ToListAsync();
-        //         // if (allUsers.Any())
-        //         // {
-        //         //     _context.Users.RemoveRange(allUsers);
-        //         //     await _context.SaveChangesAsync();
-        //         // }
+            // Read the list of admin UIDs from configuration
+            var adminUserIds = _configuration.GetSection("AdminSettings:AdminUserIds").Get<List<string>>();
 
-        //         _logger.LogWarning("Successfully deleted {RowCount} users.", rowsAffected);
-        //         return Ok($"Successfully deleted {rowsAffected} users.");
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Error occurred while clearing users.");
-        //         return StatusCode(500, "An error occurred while clearing users.");
-        //     }
-        // }
+            // Log the result of reading the configuration
+            if (adminUserIds == null)
+            {
+                _logger.LogWarning("AdminUserIds list loaded from configuration is NULL.");
+            }
+            else
+            {
+                _logger.LogInformation("AdminUserIds loaded from configuration: [{AdminIds}]", string.Join(", ", adminUserIds));
+            }
 
-        // --- NEW: Add POST endpoint to create user profile ---
+            // Perform the check
+            bool isAdmin = adminUserIds != null && adminUserIds.Contains(firebaseUid);
+
+            // Log the result of the check
+            _logger.LogInformation("Result of admin check (adminUserIds != null && adminUserIds.Contains(firebaseUid)): {IsAdminResult}", isAdmin);
+            _logger.LogInformation("--- End CheckIfUserIsAdmin ---"); // Log exit point
+
+            return isAdmin;
+        }
         [HttpPost]
-        [Authorize] // Ensure only authenticated users can create a profile
+        [Authorize]
         public async Task<IActionResult> CreateUserProfileAsync([FromBody] UserProfileCreateDto profileDto)
         {
             // 1. Get Firebase UID from the validated token
@@ -143,6 +156,9 @@ namespace BsBakerySPA.Server.Controllers
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Successfully created profile for Firebase UID: {FirebaseUid}", firebaseUid);
 
+                bool isAdmin = CheckIfUserIsAdmin(firebaseUid);
+
+
                 // 5. Return success response (e.g., 201 Created)
                 var createdProfileDto = new UserProfileDto
                 {
@@ -150,7 +166,8 @@ namespace BsBakerySPA.Server.Controllers
                     FirstName = newUser.FirstName ?? string.Empty,
                     LastName = newUser.LastName ?? string.Empty,
                     Email = newUser.Email ?? string.Empty,
-                    CreatedAt = newUser.CreatedAt
+                    CreatedAt = newUser.CreatedAt,
+                    IsAdmin = isAdmin
                 };
 
                 // --- Use CreatedAtRoute ---
@@ -182,6 +199,7 @@ namespace BsBakerySPA.Server.Controllers
             public string LastName { get; set; } = string.Empty;
             public string Email { get; set; } = string.Empty;
             public DateTime CreatedAt { get; set; }
+            public bool IsAdmin { get; set; }
         }
 
         public class UserProfileCreateDto

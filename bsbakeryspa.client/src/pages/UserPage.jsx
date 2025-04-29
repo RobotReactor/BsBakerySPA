@@ -83,22 +83,19 @@ const UserPage = () => {
             };
             fetchMyOrders();
         } else {
-            // Clear user orders if admin or logged out
             setMyOrders([]);
             setIsLoadingMyOrders(false);
         }
-    }, [user, loadingAuth, navigate, isAdmin]); // Add isAdmin dependency
+    }, [user, loadingAuth, navigate, isAdmin]);
 
-    // --- Fetch All Orders (Admin Only) ---
     useEffect(() => {
-        // Fetch all orders only if logged in AND is an admin
         if (user && isAdmin) {
             const fetchAllOrders = async () => {
                 setIsLoadingAllOrders(true);
                 setAllOrdersError('');
                 try {
                     const token = await getIdToken(user);
-                    const response = await fetch('/api/order/all', { // Call the admin endpoint
+                    const response = await fetch('/api/order/all', { 
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (!response.ok) {
@@ -107,13 +104,10 @@ const UserPage = () => {
                     }
                     const data = await response.json();
 
-                    // Handle potential $values from ReferenceHandler.Preserve
                     let ordersArray = data?.$values || (Array.isArray(data) ? data : []);
 
-                    // Process orders: parse JSON strings and potentially include user info
                     const processed = ordersArray.map(order => ({
                         ...order,
-                        // Include user details if backend sent them (check backend controller includes)
                         userFirstName: order.user?.firstName,
                         userLastName: order.user?.lastName,
                         userEmail: order.user?.email,
@@ -133,30 +127,25 @@ const UserPage = () => {
             };
             fetchAllOrders();
         } else {
-            // Clear all orders if not admin
             setAllOrders([]);
         }
-    }, [user, isAdmin]); // Rerun if user logs in/out or admin status changes
+    }, [user, isAdmin]);
 
-    // --- Filtered and Sorted Orders for Admin Display ---
     const displayOrders = useMemo(() => {
-        if (!isAdmin) return []; // Only calculate for admin
+        if (!isAdmin) return []; 
         return allOrders
             .filter(order => filterStatus === 'All' || order.status === filterStatus)
-            // Backend sorts by timestamp ascending (earliest first), keep that order
-            // .sort((a, b) => new Date(a.orderTimestamp) - new Date(b.orderTimestamp));
     }, [allOrders, filterStatus, isAdmin]);
 
     const orderForBaking = useMemo(() => {
         if (!isAdmin || !isBakingMode) return null;
-        // Find the first order (oldest due to backend sort) that needs baking
         return allOrders.find(order => BAKING_RELEVANT_STATUSES.includes(order.status));
     }, [allOrders, isAdmin, isBakingMode]);
 
     const bakingOrderSummary = useMemo(() => {
         if (!orderForBaking) return null;
 
-        const summary = {}; // { productId: { name: '...', quantity: 0, isBagel: false, distribution: {} } }
+        const summary = {}; 
 
         orderForBaking.orderItems.forEach(item => {
             const productId = item.productId;
@@ -168,21 +157,19 @@ const UserPage = () => {
                     name: productName,
                     quantity: 0,
                     isBagel: isBagel,
-                    // Store distributions separately if multiple custom bagels of same type exist (unlikely for now)
                     distribution: isBagel ? { ...(item.bagelDistribution || {}) } : null
                 };
             }
 
             summary[productId].quantity += item.quantity;
 
-            // If it's a bagel and we encounter another distribution, merge counts (simple merge for now)
             if (isBagel && item.bagelDistribution) {
                  Object.entries(item.bagelDistribution).forEach(([toppingId, count]) => {
                      summary[productId].distribution[toppingId] = (summary[productId].distribution[toppingId] || 0) + count;
                  });
             }
         });
-        return Object.values(summary); // Return as an array
+        return Object.values(summary);
     }, [orderForBaking]);
 
     const handlePendingStatusSelect = (orderId, selectedStatus) => {
@@ -192,15 +179,13 @@ const UserPage = () => {
         }));
     };
 
-    // --- Handler for Status Update Submission (Admin) ---
     const handleStatusUpdateSubmit = async (orderId, newStatus) => {
-        // Basic checks
         if (!isAdmin || !user || !newStatus) {
             console.warn("Status update cancelled:", { isAdmin, user, newStatus });
             return;
         }
 
-        setUpdatingStatusOrderId(orderId); // Indicate loading for this specific order
+        setUpdatingStatusOrderId(orderId); 
         try {
             const token = await getIdToken(user);
             const response = await fetch(`/api/order/${orderId}/status`, {
@@ -209,7 +194,6 @@ const UserPage = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                // Use the passed newStatus argument
                 body: JSON.stringify({ NewStatus: newStatus })
             });
 
@@ -220,7 +204,6 @@ const UserPage = () => {
                 throw new Error(errorText || `Failed to update status (${response.status})`);
             }
 
-            // Update the status locally in the allOrders state
             setAllOrders(prevOrders =>
                 prevOrders.map(order =>
                     order.orderId === orderId ? { ...order, status: newStatus } : order
@@ -239,44 +222,35 @@ const UserPage = () => {
             console.error(`Error updating status for order ${orderId}:`, err);
             alert(`Error updating status: ${err.message}`);
         } finally {
-            setUpdatingStatusOrderId(null); // Reset loading indicator
+            setUpdatingStatusOrderId(null);
         }
     };
 
-
-    // --- Render Logic ---
-
-    // Show main loading indicator while checking auth state
     if (loadingAuth) {
         return <div className="user-page-loading">Loading user information...</div>;
     }
 
-    // Should have been redirected by useEffect if user is null, but check again
     if (!user) {
-        return null; // Or a message indicating redirection
+        return null; 
     }
 
-    // --- Main Page Render ---
     return (
         <div className="user-page">
             <div className="user-container">
                 <h1>{isAdmin ? "Admin Dashboard" : "Your Account"}</h1>
 
-                {/* --- Admin View --- */}
                 {isAdmin && (
                     <>
                         <hr className="section-divider" />
                             <div className="order-history-section admin-orders">
-                                {/* --- Combined Filter and Mode Toggle Area --- */}
                                 <div className="admin-controls-header">
-                                    {/* Filter Controls */}
                                     <div className="admin-order-filters">
                                         <label htmlFor="statusFilter">Filter by Status: </label>
                                         <select
                                             id="statusFilter"
                                             value={filterStatus}
                                             onChange={(e) => setFilterStatus(e.target.value)}
-                                            disabled={isBakingMode} // Disable filter in baking mode
+                                            disabled={isBakingMode}
                                         >
                                             <option value="All">All</option>
                                             {ORDER_STATUSES.map(status => (
@@ -284,7 +258,6 @@ const UserPage = () => {
                                             ))}
                                         </select>
                                     </div>
-                                    {/* Baking Mode Toggle */}
                                     <div className="baking-mode-toggle">
                                         <label htmlFor="bakingModeSwitch">Baking Mode:</label>
                                         <label className="switch">
@@ -311,7 +284,6 @@ const UserPage = () => {
                                             <div className="baking-order-info">
                                                 <span>Order ID: #{orderForBaking.orderId}</span>
                                                 <span>Status: {orderForBaking.status}</span>
-                                                {/* Add customer info if available */}
                                                 <span>Customer: {orderForBaking.userFirstName || orderForBaking.userEmail || 'N/A'}</span>
                                             </div>
                                             <h3>Items Needed:</h3>
@@ -351,13 +323,12 @@ const UserPage = () => {
                                                         Mark as Ready
                                                     </button>
                                                 )}
-                                                {/* Add other actions as needed */}
+                                                {}
                                             </div>
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                // --- Standard Admin Order List View ---
                                 <>
                                     <h2>All Customer Orders</h2>
                                     {isLoadingAllOrders && <p>Loading all orders...</p>}
@@ -368,20 +339,16 @@ const UserPage = () => {
                                     {!isLoadingAllOrders && !allOrdersError && displayOrders.length > 0 && (
                                         <div className="orders-list admin-orders-list">
                                             {displayOrders.map(order => {
-                                                // Determine if the selected status is different from the current one
                                                 const pendingStatus = pendingStatusChanges[order.orderId];
                                                 const statusChanged = pendingStatus && pendingStatus !== order.status;
 
                                                 return (
                                                     <div key={order.orderId} className="order-card admin-order-card">
-                                                        {/* Admin Order Card Header */}
                                                         <div className="order-card-header">
                                                             <span>Order ID: #{order.orderId}</span>
                                                             <span>Date: {new Date(order.orderTimestamp).toLocaleDateString()}</span>
-                                                            {/* Display User Info */}
                                                             <span>User: {order.userFirstName || order.userEmail || order.userFirebaseUid}</span>
                                                         </div>
-                                                        {/* Admin Order Items List */}
                                                         <ul className="order-items-summary-list">
                                                             {order.orderItems.map(item => (
                                                                 <li key={item.orderItemId} className="order-item-summary">
@@ -400,7 +367,6 @@ const UserPage = () => {
                                                                 </li>
                                                             ))}
                                                         </ul>
-                                                        {/* Admin Order Card Footer with Status Control */}
                                                         <div className="order-card-footer admin-footer">
                                                             <div className="order-totals">
                                                                 {order.discountApplied > 0 && (
@@ -412,9 +378,7 @@ const UserPage = () => {
                                                                 <label htmlFor={`status-${order.orderId}`}>Status: </label>
                                                                 <select
                                                                     id={`status-${order.orderId}`}
-                                                                    // Use pending status for value if it exists, otherwise current status
                                                                     value={pendingStatus ?? order.status}
-                                                                    // Update pending state on change
                                                                     onChange={(e) => handlePendingStatusSelect(order.orderId, e.target.value)}
                                                                     disabled={updatingStatusOrderId === order.orderId}
                                                                 >
@@ -446,15 +410,12 @@ const UserPage = () => {
                                     )}
                                 </>
                             )}
-                            {/* --- End Conditional Content --- */}
                         </div>
                     </>
                 )}
 
-                {/* --- Regular User View --- */}
                 {!isAdmin && (
                     <>
-                        {/* Profile Section */}
                         <div className="profile-section">
                             <h2>Profile Details</h2>
                             {userProfile ? (
@@ -465,7 +426,6 @@ const UserPage = () => {
                             ) : ( <p>Loading profile...</p> )}
                         </div>
                         <hr className="section-divider" />
-                        {/* Order History Section */}
                         <div className="order-history-section">
                             <h2>Your Order History</h2>
                             {isLoadingMyOrders && <p>Loading orders...</p>}
@@ -477,13 +437,11 @@ const UserPage = () => {
                                 <div className="orders-list">
                                     {myOrders.map(order => (
                                         <div key={order.orderId} className="order-card">
-                                            {/* User Order Card Header */}
                                             <div className="order-card-header">
                                                 <span>Order ID: #{order.orderId}</span>
                                                 <span>Date: {new Date(order.orderTimestamp).toLocaleDateString()}</span>
                                                 <span>Status: {order.status}</span>
                                             </div>
-                                            {/* User Order Items List */}
                                             <ul className="order-items-summary-list">
                                                 {order.orderItems.map(item => (
                                                     <li key={item.orderItemId} className="order-item-summary">
@@ -502,7 +460,6 @@ const UserPage = () => {
                                                     </li>
                                                 ))}
                                             </ul>
-                                            {/* User Order Card Footer */}
                                             <div className="order-card-footer">
                                                 <div className="order-totals">
                                                     {order.discountApplied > 0 && (

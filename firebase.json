@@ -8,7 +8,7 @@
     "source": "dataconnect"
   },
   "hosting": {
-    "public": "bsbakeryspa.client/dist",
+    "public": "bsbakeryspa.client/build",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -16,10 +16,13 @@
     ],
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+        "source": "/api/**",
+        "run": {
+          "serviceId": "YOUR_CLOUD_RUN_SERVICE_ID",
+          "region": "us-central1" 
+        }
+      },
+    ],
   },
   "headers": [
     {

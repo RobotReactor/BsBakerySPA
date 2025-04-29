@@ -1,6 +1,6 @@
 // src/hooks/useAuth.jsx
 import React, { useState, useEffect, useCallback, createContext, useContext } from "react";
-import app from "../components/FireBase/firebaseConfig"; // Adjust path if needed
+import app from "../components/FireBase/firebaseConfig";
 
 import {
     getAuth,
@@ -12,13 +12,11 @@ import {
     getIdToken
 } from "firebase/auth";
 
-
-// --- Define Admin UIDs (Replace with actual UIDs) ---
-const ADMIN_USER_IDS = [
-    "XKE46g6IuBNZSYDyfbPLDMILfwq1",
-    "lujtPx1DerXyqicnWXwOiJI3JSK2"
-];
-// ---
+// REMOVE THIS HARDCODED LIST - IT'S NO LONGER NEEDED!
+// const ADMIN_USER_IDS = [
+//     "XKE46g6IuBNZSYDyfbPLDMILfwq1",
+//     "lujtPx1DerXyqicnWXwOiJI3JSK2"
+// ];
 
 // 1. Create the Auth Context
 const AuthContext = createContext();
@@ -26,48 +24,58 @@ const AuthContext = createContext();
 // 2. Create the AuthProvider component
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Firebase Auth user object
-    const [userProfile, setUserProfile] = useState(null); // Your backend profile data
-    const [loadingAuth, setLoadingAuth] = useState(true); // Combined loading state
+    const [userProfile, setUserProfile] = useState(null); // Your backend profile data (now includes isAdmin)
+    const [loadingAuth, setLoadingAuth] = useState(true); // Initial auth check loading
     const [loadingProfile, setLoadingProfile] = useState(false); // Specific loading for profile fetch
-    const [isAdmin, setIsAdmin] = useState(false); // <-- Add isAdmin state
+    const [isAdmin, setIsAdmin] = useState(false); // Admin state, now derived from profile
     const auth = getAuth(app);
 
-    // Function to fetch profile data from your backend
     const fetchUserProfile = useCallback(async (firebaseUser) => {
         if (!firebaseUser) {
             setUserProfile(null);
-            // Don't set loadingProfile to false here, let onAuthStateChanged handle overall loading
-            return;
+            setIsAdmin(false); // Ensure isAdmin is false if no user
+            return null; // Return null to indicate no profile fetched
         }
 
-        setLoadingProfile(true); // Start profile loading
+        setLoadingProfile(true);
+        let fetchedProfileData = null; // Variable to hold fetched data
         try {
             const token = await getIdToken(firebaseUser);
-            const response = await fetch('/api/user/profile', { // Use relative path for proxy
+            const response = await fetch('/api/user/profile', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
 
             if (response.ok) {
-                const profileData = await response.json();
-                console.log("Fetched user profile:", profileData);
-                setUserProfile(profileData);
+                fetchedProfileData = await response.json();
+                console.log("Fetched user profile:", fetchedProfileData);
+                setUserProfile(fetchedProfileData);
+                // --- Set isAdmin based on fetched profile ---
+                // Read the isAdmin property from the backend response
+                setIsAdmin(fetchedProfileData?.isAdmin || false);
+                if(fetchedProfileData?.isAdmin) {
+                    console.log("Admin status confirmed from backend profile.");
+                }
+                // ---
             } else if (response.status === 404) {
                 console.log("User profile not found in backend.");
                 setUserProfile(null);
+                setIsAdmin(false); // No profile means not admin
             } else {
-                // Handle other non-OK statuses
                 console.error("Failed to fetch user profile:", response.status, response.statusText);
                 setUserProfile(null);
+                setIsAdmin(false); // Fetch failure means not admin
             }
         } catch (error) {
             console.error("Error fetching user profile:", error);
             setUserProfile(null);
+            setIsAdmin(false); // Error means not admin
         } finally {
-            setLoadingProfile(false); // Finish profile loading
+            setLoadingProfile(false);
         }
-    }, []); // Empty dependency array as it doesn't depend on component state/props
+        return fetchedProfileData; // Return the fetched profile (or null)
+    }, []); // Empty dependency array
 
     // Effect to handle auth state changes and initial loading
     useEffect(() => {
@@ -76,20 +84,26 @@ export const AuthProvider = ({ children }) => {
             console.log("Auth State Changed:", currentUser ? currentUser.uid : 'No user');
             setUser(currentUser);
 
-            // --- Set isAdmin flag ---
-            if (currentUser && ADMIN_USER_IDS.includes(currentUser.uid)) {
-                setIsAdmin(true);
-                console.log("Admin user detected.");
-            } else {
-                setIsAdmin(false);
-            }
+            // --- Remove the old isAdmin check here ---
+            // The isAdmin state will now be set by fetchUserProfile
+            // if (currentUser && ADMIN_USER_IDS.includes(currentUser.uid)) {
+            //     setIsAdmin(true);
+            //     console.log("Admin user detected.");
+            // } else {
+            //     setIsAdmin(false);
+            // }
+            // --- Instead, reset isAdmin initially and let fetchUserProfile set it ---
+            setIsAdmin(false); // Reset admin status initially on auth change
             // ---
 
             // Fetch profile only if there's a user
             if (currentUser) {
+                // fetchUserProfile now handles setting isAdmin internally based on backend response
                 await fetchUserProfile(currentUser);
             } else {
-                setUserProfile(null); // Clear profile on logout
+                // Clear profile and ensure isAdmin is false on logout
+                setUserProfile(null);
+                setIsAdmin(false);
             }
 
             setLoadingAuth(false); // Finish initial auth loading AFTER user and profile are checked/fetched
@@ -102,9 +116,8 @@ export const AuthProvider = ({ children }) => {
         // fetchUserProfile is stable due to useCallback
     }, [auth, fetchUserProfile]); // Dependencies
 
-    // --- Auth Functions ---
+    // --- Auth Functions (No changes needed here) ---
     const login = async (email, password) => {
-        // setLoadingAuth(true); // Optional: set loading during login
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             // State updates handled by onAuthStateChanged listener
@@ -112,13 +125,10 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error("Login failed:", error.message);
             throw error; // Re-throw error to be caught by caller
-        } finally {
-            // setLoadingAuth(false);
         }
     };
 
     const signUp = async (email, password) => {
-        // setLoadingAuth(true); // Optional: set loading during sign up
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             // State updates handled by onAuthStateChanged listener
@@ -127,13 +137,10 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error("Sign-up failed:", error.message);
             throw error; // Re-throw error
-        } finally {
-            // setLoadingAuth(false);
         }
     };
 
     const guestSignIn = async () => {
-        // setLoadingAuth(true); // Optional: set loading during guest sign in
         try {
             const userCredential = await signInAnonymously(auth);
             // State updates handled by onAuthStateChanged listener
@@ -141,21 +148,15 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error("Guest sign-in failed:", error.message);
             throw error; // Re-throw error
-        } finally {
-            // setLoadingAuth(false);
         }
     };
 
     const logout = async () => {
-        // setLoadingAuth(true); // Optional: set loading during logout
         try {
             await signOut(auth);
-            // State updates (user=null, isAdmin=false, userProfile=null) handled by onAuthStateChanged listener
         } catch (error) {
             console.error("Logout failed:", error.message);
             throw error; // Re-throw error
-        } finally {
-            // setLoadingAuth(false);
         }
     };
     // --- End Auth Functions ---
@@ -166,7 +167,7 @@ export const AuthProvider = ({ children }) => {
         userProfile,
         loadingAuth, // Use this for initial app load/auth check
         loadingProfile, // Use this specifically for profile refresh/load
-        isAdmin, // Provide the admin flag
+        isAdmin, // Provide the admin flag derived from backend
         login,
         signUp,
         guestSignIn,
