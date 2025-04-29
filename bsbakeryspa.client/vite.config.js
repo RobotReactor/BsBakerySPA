@@ -15,7 +15,6 @@ const certificateName = "bsbakeryspa.client";
 const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
 const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
-// Certificate generation logic (ensure dotnet dev-certs https ran successfully)
 if (!fs.existsSync(baseFolder)) {
     fs.mkdirSync(baseFolder, { recursive: true });
 }
@@ -37,7 +36,6 @@ const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_H
     env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : `https://localhost:${defaultBackendPort}`;
 console.log(`Proxy target set to: ${target}`);
 
-// https://vitejs.dev/config/
 export default defineConfig({
     plugins: [react()],
     resolve: {
@@ -45,24 +43,21 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
-    build: { // Moved build config outside resolve
+    build: {
         outDir: 'build',
     },
     server: {
-        // --- Proxy Configuration ---
         proxy: {
-            '/api': { // Forward requests starting with /api
-                target: target, // To your backend server
+            '/api': {
+                target: target,
                 changeOrigin: true,
-                secure: false, // Allow self-signed certs
+                secure: false,
             }
         },
-        // --- Frontend Server Port & HTTPS ---
-        port: 5173, // Vite dev server port
+        port: 5173,
         https: {
             key: fs.readFileSync(keyFilePath),
             cert: fs.readFileSync(certFilePath),
         }
-        // Removed the extra nested 'server' object here
     }
 });

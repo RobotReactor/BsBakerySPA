@@ -1,8 +1,8 @@
+sourceDir: BsBakerySPA.Server
+
 runConfig:
   minInstances: 0
 
-
-# Environment variables and secrets.
 env:
   - variable: AdminSettings__AdminUserIds__0
     value: "XKE46g6IuBNZSYDyfbPLDMILfwq1"
@@ -14,20 +14,16 @@ env:
       - RUNTIME
 
   - variable: ConnectionStrings__DefaultConnection
-    # --- IMPORTANT: Replace this placeholder with your ACTUAL connection string ---
     value: "Data Source=bsbakery_dev.db"
     availability:
       - RUNTIME
 
-  # --- Add AllowedCorsOrigin for your deployed frontend ---
   - variable: AllowedCorsOrigin
-    # --- IMPORTANT: Replace with your actual Firebase Hosting URL ---
-    value: "https://bs-bakery-e7ef2.web.app" # Or your custom domain
+    value: "https://bs-bakery-e7ef2.web.app" 
     availability:
       - RUNTIME
 
-  # --- Firebase Project ID (Good practice to set explicitly) ---
-  - variable: Firebase__ProjectId # Matches the structure your Program.cs reads
+  - variable: Firebase__ProjectId 
     value: "bs-bakery-e7ef2"
     availability:
       - RUNTIME
