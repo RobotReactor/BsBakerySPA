@@ -9,7 +9,7 @@
 }
 
 body {
-    background-image: url('C:\Users\maxwe\Documents\Github Directories\BsBakerySPA\bsbakeryspa.client\public\paper-background.jpg');
+    background-image: url('../assets/paper-background.jpg');
     background-size: cover;
     background-attachment: fixed;
     font-family: "Nothing You Could Do", cursive;

@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\BsBakerySPA.Server.csproj": {}
+    "/Users/maxwellbourcier/Documents/Code Repos/BsBakerySPA/BsBakerySPA.Server/BsBakerySPA.Server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\BsBakerySPA.Server.csproj": {
+    "/Users/maxwellbourcier/Documents/Code Repos/BsBakerySPA/BsBakerySPA.Server/BsBakerySPA.Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\BsBakerySPA.Server.csproj",
+        "projectUniqueName": "/Users/maxwellbourcier/Documents/Code Repos/BsBakerySPA/BsBakerySPA.Server/BsBakerySPA.Server.csproj",
         "projectName": "BsBakerySPA.Server",
-        "projectPath": "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\BsBakerySPA.Server.csproj",
-        "packagesPath": "C:\\Users\\maxwe\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\obj\\",
+        "projectPath": "/Users/maxwellbourcier/Documents/Code Repos/BsBakerySPA/BsBakerySPA.Server/BsBakerySPA.Server.csproj",
+        "packagesPath": "/Users/maxwellbourcier/.nuget/packages/",
+        "outputPath": "/Users/maxwellbourcier/Documents/Code Repos/BsBakerySPA/BsBakerySPA.Server/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\maxwe\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/maxwellbourcier/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -43,8 +37,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.200"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -102,7 +95,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

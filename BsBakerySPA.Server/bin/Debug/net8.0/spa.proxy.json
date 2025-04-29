@@ -3,7 +3,7 @@
 "ServerUrl": "https://localhost:5173",
 "RedirectUrl": "",
 "LaunchCommand": "npm run dev",
-"WorkingDirectory": "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\..\\bsbakeryspa.client",
+"WorkingDirectory": "/Users/maxwellbourcier/Documents/Code Repos/BsBakerySPA/BsBakerySPA.Server/../bsbakeryspa.client",
 "MaxTimeoutInSeconds": "120",
 "KeepRunning": "false"
 }

@@ -1,20 +1,11 @@
 {
   "Version": 1,
-  "Hash": "4DNXS7bZ8HLH3T9Vw+xgb1I49/SK+bZ12pyopmHIbRI=",
+  "Hash": "o6uQ/zSS/TMlvYEJC3DmC+eV+nfwjEqublHtJsu5974=",
   "Source": "BsBakerySPA.Server",
   "BasePath": "_content/BsBakerySPA.Server",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [
-    {
-      "Name": "BsBakerySPA.Server\\wwwroot",
-      "Source": "BsBakerySPA.Server",
-      "ContentRoot": "C:\\Users\\maxwe\\Documents\\Github Directories\\BsBakerySPA\\BsBakerySPA.Server\\wwwroot\\",
-      "BasePath": "_content/BsBakerySPA.Server",
-      "Pattern": "**"
-    }
-  ],
-  "Assets": [],
-  "Endpoints": []
+  "DiscoveryPatterns": [],
+  "Assets": []
 }
