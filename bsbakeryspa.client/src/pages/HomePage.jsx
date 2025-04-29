@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowDown } from 'react-icons/fa';
-import Navbar from '../components/NavBar/NavBar.jsx';
+import Navbar from '../components/NavBar/Navbar.jsx';
 import OrderModal from '../components/OrderModal/OrderModal.jsx';
 import CustomizationModal from '../components/CustomizationModal/CustomizationModal.jsx';
 import CartDropdown from '../components/CartDropdown/CartDropdown.jsx';
