@@ -1,44 +1,33 @@
-# Settings for Backend (on Cloud Run managed by App Hosting).
-# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
 runConfig:
   minInstances: 0
-  # maxInstances: 100
-  # concurrency: 80
-  # cpu: 1
-  # memoryMiB: 512 # Consider increasing if your backend needs more memory
+
 
 # Environment variables and secrets.
 env:
-  # --- Add your Admin User IDs ---
-  # Use the double underscore format for hierarchical settings
   - variable: AdminSettings__AdminUserIds__0
-    value: "XKE46g6IuBNZSYDyfbPLDMILfwq1" # Make sure value is quoted if it contains special chars
+    value: "XKE46g6IuBNZSYDyfbPLDMILfwq1"
     availability:
-      - RUNTIME # Needs to be available when the backend runs
+      - RUNTIME
   - variable: AdminSettings__AdminUserIds__1
     value: "lujtPx1DerXyqicnWXwOiJI3JSK2"
     availability:
       - RUNTIME
 
-  # --- Add your Database Connection String ---
-  # Option 1: Directly as an environment variable (Less Secure)
-  # - variable: ConnectionStrings__DefaultConnection
-  #   value: "Your_Actual_Production_Database_Connection_String"
-  #   availability:
-  #     - RUNTIME
-
-  # Option 2: Using Cloud Secret Manager (More Secure - Recommended for sensitive data)
-  # 1. Create a secret in Google Cloud Secret Manager (e.g., named "db-connection-string")
-  # 2. Grant the App Hosting service agent permission to access the secret.
-  # 3. Reference the secret here:
-  - variable: ConnectionStrings__DefaultConnection # Your code still reads this env var
-    secret: db-connection-string # Name of the secret in Secret Manager
+  - variable: ConnectionStrings__DefaultConnection
+    # --- IMPORTANT: Replace this placeholder with your ACTUAL connection string ---
+    value: "Data Source=bsbakery_dev.db"
     availability:
       - RUNTIME
 
-  # Example of another variable
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
+  # --- Add AllowedCorsOrigin for your deployed frontend ---
+  - variable: AllowedCorsOrigin
+    # --- IMPORTANT: Replace with your actual Firebase Hosting URL ---
+    value: "https://bs-bakery-e7ef2.web.app" # Or your custom domain
+    availability:
+      - RUNTIME
+
+  # --- Firebase Project ID (Good practice to set explicitly) ---
+  - variable: Firebase__ProjectId # Matches the structure your Program.cs reads
+    value: "bs-bakery-e7ef2"
+    availability:
+      - RUNTIME
