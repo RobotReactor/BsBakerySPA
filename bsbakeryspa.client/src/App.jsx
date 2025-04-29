@@ -2,11 +2,11 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './styles/App.css';
 
-import HomePage from './pages/HomePage';
+import HomePage from './pages/HomePage.jsx';
 import Checkout from './pages/CheckoutPage.jsx';
-import Payment from './pages/PaymentPage';
-import LoginPage from './pages/LoginPage';
-import UserPage from './pages/UserPage';
+import Payment from './pages/PaymentPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import UserPage from './pages/UserPage.jsx';
 
 import { AuthProvider } from './hooks/useAuth.jsx';
 import { CartProvider } from './context/CartContext.jsx'

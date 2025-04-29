@@ -16,13 +16,11 @@
     ],
     "rewrites": [
       {
-        "source": "/api/**",
-        "run": {
-          "serviceId": "YOUR_CLOUD_RUN_SERVICE_ID",
-          "region": "us-central1" 
-        }
-      },
+        "source": "**",
+        "destination": "/index.html"
+      }
     ],
+    "appAssociation": "AUTO" 
   },
   "headers": [
     {
